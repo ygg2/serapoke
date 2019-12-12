@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body {
+        background-color: #333333;
+        justify-content: center;
+        display: flex;
+        margin: 0;
+        padding: 0;
+      }
+      canvas {
+        background-color: #000000;
+        /*image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;*/
+        max-width: 100vw;
+        max-height: 100vh;
+        /*width: 1280px;
+        height: 720px;*/
+      }
+      #gameDiv {
+        line-height: 0;
+      }
+      .mobile-key {
+        display: none;
+      }
+      @media (max-width: 800px) {
+      .mobile-key {
+        display: block;
+      }
+      #arrowKeys {
+        position: fixed;
+        left: 0;
+        top: 50%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      #xAndZ {
+        position: fixed;
+        right: 0;
+        top: 50%;
+      }
+      }
+    </style>
+    <title id="gameTitle"></title>
+  </head>
+  <body>
+    <div id="gameDiv">
+    </div>
+    <div id="arrowKeys" class="mobile-key">
+      <span></span>
+      <button class="key-up"
+        onmousedown="keyboard_key_press('ArrowUp')"
+        onmouseup="keyboard_key_release('ArrowUp')">
+        ^
+      </button>
+      <span></span>
+      <button class="key-left"
+        onmousedown="keyboard_key_press('ArrowLeft')"
+        onmouseup="keyboard_key_release('ArrowLeft')">
+        <
+      </button>
+      <button class="key-down"
+        onmousedown="keyboard_key_press('ArrowDown')"
+        onmouseup="keyboard_key_release('ArrowDown')">
+        V
+      </button>
+      <button class="key-right"
+        onmousedown="keyboard_key_press('ArrowRight')"
+        onmouseup="keyboard_key_release('ArrowRight')">
+        >
+      </button>
+    </div>
+    <div id="xAndZ" class="mobile-key">
+      <button
+        onmousedown="keyboard_key_press('KeyX')"
+        onmouseup="keyboard_key_release('KeyX')">
+        X
+      </button>
+      <button
+        onmousedown="keyboard_key_press('KeyZ')"
+        onmouseup="keyboard_key_release('KeyZ')">
+        Z
+      </button>
+    </div>
+    <script src="scripts/easy_tween.js"></script>
+    <script src="scripts/constant.js"></script>
+    <script src="scripts/sprite.js"></script>
+    <script src="scripts/object.js"></script>
+    <script src="scripts/room.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/talking.js"></script>
+    <script src="scripts/loop.js"></script>
+  </body>
+</html>
