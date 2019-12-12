@@ -8,6 +8,26 @@
   </div>
 </template>
 
+<script>
+var fs = require("fs");
+export default {
+  data() {
+    return {
+      sprites: {}
+    };
+  },
+  mounted() {
+    fs.readFile("../scripts/sprite.js", "utf8", (err, fd) => {
+      if (err) throw err;
+      let spritefile = fd.slice(13);
+      this.sprites = JSON.parse(spritefile);
+      console.log(spritefile);
+      console.log(this.sprites);
+    });
+  }
+};
+</script>
+
 <style>
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
