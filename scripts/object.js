@@ -14,13 +14,6 @@ var landscape = {
   bridge: true,
   telescope: true,
 };
-var area_list = {
-  gormott: ["Gormott"],
-  uraya: ["Uraya"],
-  mor_ardain: ["Mor Ardain"],
-  leftheria: ["Leftheria"]
-}
-var areas = [area_list.gormott];
 var progress = 0;
 if (localStorage.getItem('save')) {
   var main_menu_item = [
@@ -35,6 +28,16 @@ if (localStorage.getItem('save')) {
 }
 
 function create_objects() {
+items = {
+  journal: {
+    name: "Journal",
+    description: "I'll use this to record what happens."
+  },
+  mask: {
+    name: "Mask",
+    description: "The mask Lora made for me. Don't forget her."
+  }
+}
 
 // player
 player = new Player(17, 14, spr.jin_nomask);
@@ -81,53 +84,6 @@ label.xno_load = [
   player.visible = true;
 }
 ]
-
-// ITEMS
-items = {
-  journal: {
-    name: "Journal",
-    description: "I'll use this to record what happens."
-  },
-  mask: {
-    name: "Mask",
-    description: "The mask Lora made for me. Don't forget her."
-  }
-}
-
-// Jin's house
-jin_house = {
-  test: new Npc([
-    { drop: "journal",
-      message: "On second thought, let me put the journal back...",
-      backup: "There's a feather pen on the desk.",
-      after: "I'll just leave my journal here."
-    }
-  ]),
-  picture: new Npc(["A photograph from our journey."]),
-  bed: new Npc(["A comfy bed for a well-needed rest."]),
-  desk: new Npc([
-  	{ pickup: "journal",
-  	  message: "I should take my journal with me.",
-  	  after: "The desk space is neat and tidy."
-  	}
-  ]),
-  door: new Door("Island", {x:0, y:0})
-}
-
-// Jin's island
-jin_island = {
-  telescope: new Npc(["Check out the view"],
-    { spawn_condition: () => landscape.telescope }
-  ),
-  rock: new Npc(["A rock. Always has been, always will be."],{image:spr.rock}),
-  azurda: new Npc(
-    ["So you plan to help the survivors?",
-    "Lora would approve."],
-    { second_dialogue: [ "Where to?", { menu:text, choices: areas } ],
-      name:"Azurda"
-    }
-  )
-}
 
 
 // Npc(dialogue, options)

@@ -135,7 +135,11 @@ function Preload() {
       // when done create objects, rooms, and start the game
       if (remaining<=0) {
         create_objects();
-        create_rooms();
+        // first room is a title screen
+        create_level("Title");
+        in_talk = true;
+        story = label.main_menu;
+        bt.Next();
         room.start();
         bt.adv.box.image = spr.box;
         Main();
@@ -340,16 +344,15 @@ Player.prototype.get_input = function() {
     }
   }
 
-function Npc(dialogue, options) {
-  if (!options) options = {};
-  this.name = options.name || "";
-  this.image = options.image;
+function Npc({dialogue, name, image, second_dialogue, spawn_condition, mask}) {
+  this.name = name || "";
+  this.image = spr[image];
   this.dialogue = dialogue;
-  this.second_dialogue = options.second_dialogue || false;
-  this.spawn_condition = options.spawn_condition || (() => true);
+  this.second_dialogue = second_dialogue || false;
+  this.spawn_condition = spawn_condition || false;
   this.x = 0;
   this.y = 0;
-  this.mask = options.mask || {
+  this.mask = mask || {
     x: 0,
     y: 0,
     width: GRIDSIZE,
@@ -577,7 +580,7 @@ Menu.prototype.update_choice = function() {
 }
 
 function spawn_npc(x, y, npc, solid = true) {
-  if (npc.spawn_condition()) {
+  if (!npc.spawn_condition || landscape[npc.spawn_condition]) {
     npc.x = x*GRIDSIZE;
     npc.y = y*GRIDSIZE;
     npcs.push(npc);
@@ -592,26 +595,26 @@ var room_background = new Img(0, 0, BLANK_IMAGE);
 var npcs = [];
 // create level: make the correct blocks
 function create_level(lvl) {
-  room.map = lvl;
+  room.map = maps[lvl].map;
   blocks = [];
   var block_id=0;
   var npc_id = 0;
-  map_w = GRIDSIZE*map_width[lvl];
-  map_h = GRIDSIZE*map_height[lvl];
-  room_background.image = map_background[lvl];
-  for (var y=0;y<map_height[lvl];y++) {
-    for (var x=0;x<map_width[lvl];x++) {
-      if (map[lvl][block_id]==1) {
+  map_w = GRIDSIZE*maps[lvl].width;
+  map_h = GRIDSIZE*maps[lvl].height;
+  room_background.image = spr[maps[lvl].background];
+  for (var y=0;y<maps[lvl].height;y++) {
+    for (var x=0;x<maps[lvl].width;x++) {
+      if (maps[lvl].map[block_id]==1) {
         blocks.push(new Img(x*GRIDSIZE,y*GRIDSIZE,spr.block));
       }
-      else if (map[lvl][block_id]==5) {
-        spawn_npc(x, y, map_npcs[lvl][npc_id]);
+      else if (maps[lvl].map[block_id]==5) {
+        spawn_npc(x, y, new Npc(maps[lvl].npcs[npc_id]));
         npc_id++;
       }
     block_id++;
     }
   }
-  if (creation_code[lvl]) {
-    creation_code[lvl]();
+  if (maps[lvl].creation_code) {
+    maps[lvl].creation_code();
   }
 }
