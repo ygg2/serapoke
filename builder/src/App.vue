@@ -1,13 +1,16 @@
 <template>
   <v-app id="app">
-    <nav-bar :maps="maps" />
-    <v-content>
+    <nav-bar :maps="maps" :npc.sync="selectedNPC" />
+    <v-content app>
       <div id="nav">
         <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link>
+        <router-link to="/about">About</router-link> |
+        <router-link to="/npc">NPC</router-link>
       </div>
       <!-- router view will be showing the block or npc w/script editor -->
-      <router-view :sprites="sprites" :maps="maps" />
+      <v-row align="center" justify="center">
+        <router-view :selected.sync="selected" :sprites="sprites" />
+      </v-row>
     </v-content>
   </v-app>
 </template>
@@ -43,7 +46,14 @@ export default {
             }
           ]
         }
-      }
+      },
+      selectedMap: 'testmap',
+      selectedNPC: 0
+    }
+  },
+  computed: {
+    selected() {
+      return this.maps[this.selectedMap].npcs[this.selectedNPC]
     }
   },
   mounted() {

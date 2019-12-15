@@ -15,10 +15,6 @@ export default {
     sprites: {
       type: Object,
       required: true
-    },
-    maps: {
-      type: Object,
-      required: true
     }
   }
 }

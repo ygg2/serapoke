@@ -6,16 +6,22 @@
         <v-btn>Objects</v-btn>
       </v-btn-toggle>
       <v-row>
-        <v-col>
+        <v-col cols="3">
           <v-text-field label="Width" type="number" dense hide-details />
         </v-col>
-        <v-col>
+        <v-col cols="3">
           <v-text-field label="Height" type="number" dense hide-details />
         </v-col>
+        <v-col>
+          <v-text-field label="Tileset" dense hide-details />
+        </v-col>
       </v-row>
-      <v-text-field label="Tileset" />
     </v-container>
-    <object-list v-show="placing == 1" :map="map" />
+    <object-list
+      v-show="placing == 1"
+      :map="map"
+      @update:npc="$emit('update:npc', $event)"
+    />
     <v-container class="fixed-bottom">
       <v-row dense>
         <v-col cols="2">
@@ -46,6 +52,10 @@ export default {
   props: {
     maps: {
       type: Object,
+      required: true
+    },
+    npc: {
+      type: Number,
       required: true
     }
   },
