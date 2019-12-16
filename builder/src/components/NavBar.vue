@@ -13,7 +13,13 @@
           <v-text-field label="Height" type="number" dense hide-details />
         </v-col>
         <v-col>
-          <v-text-field label="Tileset" dense hide-details />
+          <v-text-field
+            label="Tileset"
+            :value="tileset"
+            @input="$emit('update:tileset', $event)"
+            dense
+            hide-details
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -38,7 +44,22 @@
           />
         </v-col>
       </v-row>
-      <v-btn @click="$emit('save-map')" tile block>Save Current Map</v-btn>
+      <v-row>
+        <v-col>
+          <v-btn @click="$emit('save-map')" tile block>Save All</v-btn>
+        </v-col>
+        <v-col>
+          <v-btn @click="$emit('change-project-folder')" tile block>
+            <v-icon color="grey">mdi-folder</v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-alert v-show="error" text color="red">
+        {{ error }}
+        <v-btn @click="$emit('show-error-log')" icon color="red">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </v-alert>
     </v-container>
   </v-navigation-drawer>
 </template>
@@ -50,6 +71,10 @@ export default {
     'object-list': ObjectList
   },
   props: {
+    tileset: {
+      type: String,
+      required: true
+    },
     maps: {
       type: Object,
       required: true
@@ -57,6 +82,10 @@ export default {
     npc: {
       type: Number,
       required: true
+    },
+    error: {
+      type: String,
+      default: ''
     }
   },
   data() {

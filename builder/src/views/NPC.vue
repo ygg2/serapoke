@@ -1,5 +1,5 @@
 <template>
-  <v-card raised>
+  <v-card raised style="width:80%">
     <v-container>
       <v-row>
         <v-col>
@@ -28,7 +28,10 @@
           </v-card-text>
         </v-col>
         <v-col>
-          <script-editor :story="selected.dialogue" />
+          <script-editor
+            :story.sync="selected.dialogue"
+            :name="selected.name"
+          />
         </v-col>
       </v-row>
     </v-container>

@@ -1,6 +1,14 @@
 <template>
   <v-app id="app">
-    <nav-bar :maps="maps" :npc.sync="selectedNPC" />
+    <nav-bar
+      :tileset.sync="tileset"
+      :maps="maps"
+      :npc.sync="selectedNPC"
+      :error="error"
+      @save-map="saveStuff"
+      @change-project-folder="changeProjectFolder"
+      @show-error-log="showErrorLog = true"
+    />
     <v-content app>
       <div id="nav">
         <router-link to="/">Home</router-link> |
@@ -11,6 +19,24 @@
       <v-row align="center" justify="center">
         <router-view :selected.sync="selected" :sprites="sprites" />
       </v-row>
+      <v-snackbar
+        v-model="notifVisible"
+        absolute
+        bottom
+        :color="notifColor"
+        :timeout="3000"
+      >
+        {{ notif }}
+        <v-btn text @click="notifVisible = false">CLOSE</v-btn>
+      </v-snackbar>
+      <v-dialog v-model="showErrorLog">
+        <v-card>
+          <v-card-title>Error Log</v-card-title>
+          <v-card-text>
+            <p v-for="(err, i) of errorLog" :key="i">{{ err }}</p>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </v-content>
   </v-app>
 </template>
@@ -18,6 +44,10 @@
 <script>
 import NavBar from '@/components/NavBar.vue'
 var fs = require('fs')
+const fsprom = fs.promises
+var path = require('path')
+const { app, dialog } = require('electron').remote
+
 export default {
   components: {
     'nav-bar': NavBar
@@ -48,7 +78,15 @@ export default {
         }
       },
       selectedMap: 'testmap',
-      selectedNPC: 0
+      selectedNPC: 0,
+      tileset: '',
+      projectPath: '',
+      error: '',
+      errorLog: [],
+      showErrorLog: false,
+      notifVisible: false,
+      notif: '',
+      notifColor: 'green'
     }
   },
   computed: {
@@ -57,31 +95,105 @@ export default {
     }
   },
   mounted() {
-    // loadStuff()
+    this.changeProjectFolder()
+    this.loadStuff()
   },
   methods: {
-    loadStuff() {
-      fs.readFile('../scripts/sprite.js', 'utf8', (err, fd) => {
-        if (err) throw err
-        this.sprites = JSON.parse(fd.slice(14))
+    showNotif(message, error = true) {
+      // log an error in the error log
+      if (error) {
+        this.error = message
+        this.errorLog.push(message)
+      }
+      // display notification at the bottom of the screen
+      this.notifColor = error ? 'red' : 'green'
+      this.notif = message
+      this.notifVisible = true
+    },
+    logError(message) {
+      this.errorLog.push(message)
+    },
+    changeProjectFolder() {
+      // ask for file
+      let savePath = dialog.showOpenDialogSync({
+        message: 'Choose the project folder to save in',
+        properties: ['openDirectory']
       })
-      fs.readFile('../scripts/room.js', 'utf8', (err, fd) => {
-        if (err) throw err
-        this.maps = JSON.parse(fd.slice(11))
-      })
+      // set the project path and save it to appdata
+      if (savePath) {
+        this.error = ''
+        this.projectPath = savePath[0]
+        // to app.getPath('userData')
+        this.showNotif('Set project folder to ' + this.projectPath, false)
+        this.loadStuff()
+      } else {
+        // warn if the user closed the file dialog
+        this.error = 'Warning: you must choose a folder.'
+      }
+    },
+    async loadStuff() {
+      // load sprites
+      let spr
+      let spriteFile = path.join(this.projectPath, 'scripts/sprite.js')
+      try {
+        spr = await fsprom.readFile(spriteFile, { encoding: 'utf8' })
+      } catch (err) {
+        this.showNotif('Error reading sprite file.')
+        this.logError(err)
+      }
+      try {
+        this.sprites = JSON.parse(spr.slice(14))
+      } catch (err) {
+        this.showNotif('Error parsing sprite file.')
+        this.logError(err)
+      }
+      // load maps
+      let map
+      let mapFile = path.join(this.projectPath, 'scripts/room.js')
+      try {
+        map = await fsprom.readFile(mapFile, { encoding: 'utf8' })
+      } catch (err) {
+        this.showNotif('Error reading map file.')
+        this.logError(err)
+      }
+      try {
+        this.maps = JSON.parse(map.slice(11))
+      } catch (err) {
+        this.showNotif('Error parsing map file.')
+        this.logError(err)
+      }
+      this.showNotif('Successfully loaded.', false)
     },
     // save JSON as js file by appending variable declaration to it
+    saveStuff() {
+      if (this.projectPath) {
+        this.saveSprites()
+        this.saveMaps()
+      } else {
+        this.error = 'Cannot save without a valid project folder.'
+      }
+    },
     saveSprites() {
       let spritetxt = 'var SPRITES = ' + JSON.stringify(this.sprites)
-      fs.writeFile('../scripts/sprite.js', spritetxt, err => {
+      let spriteFile = path.join(this.projectPath, 'scripts/sprite.js')
+      fs.writeFile(spriteFile, spritetxt, err => {
         if (err) throw err
       })
     },
-    saveMaps() {
+    saveMaps(savePath) {
       let maptxt = 'var maps = ' + JSON.stringify(this.maps)
-      fs.writeFile('../scripts/room.js', maptxt, err => {
+      let mapFile = path.join(this.projectPath, 'scripts/room.js')
+      fs.writeFile(mapFile, maptxt, err => {
         if (err) throw err
       })
+    },
+    // thanks @ https://stackoverflow.com/questions/44425495/
+    getAppRoot() {
+      if (process.platform === 'win32') {
+        return path.join(app.getAppPath(), '/../../../')
+      } else {
+        return path.join(app.getAppPath(), '/../../../../')
+      }
     }
   }
 }
