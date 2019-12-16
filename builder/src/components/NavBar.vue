@@ -25,7 +25,7 @@
     </v-container>
     <object-list
       v-show="placing == 1"
-      :map="map"
+      :map="computedMap"
       @update:npc="$emit('update:npc', $event)"
     />
     <v-container class="fixed-bottom">
@@ -39,18 +39,31 @@
           <v-select
             :items="Object.keys(maps)"
             label="Map"
-            v-model="selectedMap"
+            :value="map"
+            @input="$emit('update:map', $event)"
             dense
           />
         </v-col>
       </v-row>
       <v-row>
         <v-col>
-          <v-btn @click="$emit('save-map')" tile block>Save All</v-btn>
+          <v-btn @click="$emit('save-map')" tile block>
+            Save All
+            <v-progress-circular
+              v-if="saving"
+              indeterminate
+              color="grey"
+            ></v-progress-circular>
+          </v-btn>
         </v-col>
         <v-col>
           <v-btn @click="$emit('change-project-folder')" tile block>
-            <v-icon color="grey">mdi-folder</v-icon>
+            <v-icon v-if="!loading" color="grey">mdi-folder</v-icon>
+            <v-progress-circular
+              v-if="loading"
+              indeterminate
+              color="grey"
+            ></v-progress-circular>
           </v-btn>
         </v-col>
       </v-row>
@@ -79,6 +92,10 @@ export default {
       type: Object,
       required: true
     },
+    map: {
+      type: String,
+      required: true
+    },
     npc: {
       type: Number,
       required: true
@@ -86,6 +103,14 @@ export default {
     error: {
       type: String,
       default: ''
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    saving: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -95,8 +120,8 @@ export default {
     }
   },
   computed: {
-    map() {
-      return this.maps[this.selectedMap] ? this.maps[this.selectedMap] : {}
+    computedMap() {
+      return this.map ? this.maps[this.map] : { nomap: true }
     }
   }
 }

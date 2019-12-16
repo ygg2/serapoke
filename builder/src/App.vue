@@ -3,22 +3,18 @@
     <nav-bar
       :tileset.sync="tileset"
       :maps="maps"
+      :map.sync="selectedMap"
       :npc.sync="selectedNPC"
       :error="error"
+      :loading="isLoading"
+      :saving="isSaving"
       @save-map="saveStuff"
       @change-project-folder="changeProjectFolder"
       @show-error-log="showErrorLog = true"
     />
     <v-content app>
-      <div id="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link> |
-        <router-link to="/npc">NPC</router-link>
-      </div>
       <!-- router view will be showing the block or npc w/script editor -->
-      <v-row align="center" justify="center">
         <router-view :selected.sync="selected" :sprites="sprites" />
-      </v-row>
       <v-snackbar
         v-model="notifVisible"
         absolute
@@ -54,30 +50,13 @@ export default {
   },
   data() {
     return {
-      sprites: {
-        yuu: 'yuu.png'
-      },
+      sprites: {},
       maps: {
-        testmap: {
-          map: [0, 0, 0, 1, 1, 1, 0, 1, 1],
-          width: 3,
-          height: 3,
-          npcs: [
-            {
-              name: 'Test NPC',
-              dialogue: ['some test dialogue', 'more test dialogue'],
-              spawn_condition: 'spawn condition',
-              image: 'image'
-            },
-            {
-              name: 'Yuu',
-              dialogue: ['Need some fries with that?'],
-              image: 'yuu'
-            }
-          ]
+        defaultmap: {
+          npcs: [{ name: 'NPC', dialogue: ['sample dialogue'] }]
         }
       },
-      selectedMap: 'testmap',
+      selectedMap: 'defaultmap',
       selectedNPC: 0,
       tileset: '',
       projectPath: '',
@@ -86,17 +65,27 @@ export default {
       showErrorLog: false,
       notifVisible: false,
       notif: '',
-      notifColor: 'green'
+      notifColor: 'green',
+      isLoading: false,
+      isSaving: false
     }
   },
   computed: {
     selected() {
+      // return object containing NOMAP or NONPC flags
+      if (!this.selectedMap) return { nomap: true, nonpcs: true }
+      if (!this.maps[this.selectedMap].npcs.length) return { nonpcs: true }
       return this.maps[this.selectedMap].npcs[this.selectedNPC]
     }
   },
   mounted() {
-    this.changeProjectFolder()
-    this.loadStuff()
+    let appData = path.join(app.getPath('userData'), 'projectpath.txt')
+    try {
+      this.projectPath = fs.readFileSync(appData, { encoding: 'utf8' })
+      this.loadStuff()
+    } catch (err) {
+      this.changeProjectFolder()
+    }
   },
   methods: {
     showNotif(message, error = true) {
@@ -123,8 +112,12 @@ export default {
       if (savePath) {
         this.error = ''
         this.projectPath = savePath[0]
-        // to app.getPath('userData')
-        this.showNotif('Set project folder to ' + this.projectPath, false)
+        let appData = path.join(app.getPath('userData'), 'projectpath.txt')
+        try {
+          fs.writeFileSync(appData, this.projectPath)
+        } catch (err) {
+          fs.appendFileSync(appData, this.projectPath)
+        }
         this.loadStuff()
       } else {
         // warn if the user closed the file dialog
@@ -132,68 +125,65 @@ export default {
       }
     },
     async loadStuff() {
+      let success = true
+      this.isLoading = true
       // load sprites
-      let spr
       let spriteFile = path.join(this.projectPath, 'scripts/sprite.js')
       try {
-        spr = await fsprom.readFile(spriteFile, { encoding: 'utf8' })
-      } catch (err) {
-        this.showNotif('Error reading sprite file.')
-        this.logError(err)
-      }
-      try {
+        let spr = await fsprom.readFile(spriteFile, { encoding: 'utf8' })
         this.sprites = JSON.parse(spr.slice(14))
       } catch (err) {
-        this.showNotif('Error parsing sprite file.')
+        if (err instanceof SyntaxError) {
+          this.showNotif('Error parsing sprite file.')
+        } else {
+          this.showNotif('Error reading sprite file.')
+        }
         this.logError(err)
+        success = false
       }
       // load maps
-      let map
       let mapFile = path.join(this.projectPath, 'scripts/room.js')
       try {
-        map = await fsprom.readFile(mapFile, { encoding: 'utf8' })
-      } catch (err) {
-        this.showNotif('Error reading map file.')
-        this.logError(err)
-      }
-      try {
+        let map = await fsprom.readFile(mapFile, { encoding: 'utf8' })
         this.maps = JSON.parse(map.slice(11))
+        // unselect any map
+        this.selectedMap = ''
       } catch (err) {
-        this.showNotif('Error parsing map file.')
+        if (err instanceof SyntaxError) {
+          this.showNotif('Error parsing map file.')
+        } else {
+          this.showNotif('Error reading map file.')
+        }
         this.logError(err)
+        success = false
       }
-      this.showNotif('Successfully loaded.', false)
+      // once everything has loaded
+      this.isLoading = false
+      if (success) {
+        this.showNotif('Successfully loaded project ' + this.projectPath, false)
+      }
     },
     // save JSON as js file by appending variable declaration to it
-    saveStuff() {
+    async saveStuff() {
+      this.isSaving = true
       if (this.projectPath) {
-        this.saveSprites()
-        this.saveMaps()
+        try {
+          // saving sprites
+          let spritetxt = 'var SPRITES = ' + JSON.stringify(this.sprites)
+          let spriteFile = path.join(this.projectPath, 'scripts/sprite.js')
+          await fsprom.writeFile(spriteFile, spritetxt)
+          // saving maps
+          let maptxt = 'var maps = ' + JSON.stringify(this.maps)
+          let mapFile = path.join(this.projectPath, 'scripts/room.js')
+          await fsprom.writeFile(mapFile, maptxt)
+        } catch (error) {
+          this.showNotif('Could not save the project.')
+          this.logError(error)
+        }
       } else {
         this.error = 'Cannot save without a valid project folder.'
       }
-    },
-    saveSprites() {
-      let spritetxt = 'var SPRITES = ' + JSON.stringify(this.sprites)
-      let spriteFile = path.join(this.projectPath, 'scripts/sprite.js')
-      fs.writeFile(spriteFile, spritetxt, err => {
-        if (err) throw err
-      })
-    },
-    saveMaps(savePath) {
-      let maptxt = 'var maps = ' + JSON.stringify(this.maps)
-      let mapFile = path.join(this.projectPath, 'scripts/room.js')
-      fs.writeFile(mapFile, maptxt, err => {
-        if (err) throw err
-      })
-    },
-    // thanks @ https://stackoverflow.com/questions/44425495/
-    getAppRoot() {
-      if (process.platform === 'win32') {
-        return path.join(app.getAppPath(), '/../../../')
-      } else {
-        return path.join(app.getAppPath(), '/../../../../')
-      }
+      this.isSaving = false
     }
   }
 }
@@ -205,5 +195,12 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+}
+.full-cover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>
