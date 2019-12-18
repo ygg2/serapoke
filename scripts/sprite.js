@@ -1,1 +1,1 @@
-var SPRITES = {"yuu":"yuu.png"}
+var SPRITES = {"block":"images/block.png","font":"images/umeplus_gothic_basic.png","main_menu":"maps/samplemap.png","menu_indicator":"images/rock.png","box":"images/block.png","jin_nomask":"images/jin_nomask.png","rock":"images/rock.png","jin_home":"maps/jin_house.png"}

@@ -404,6 +404,10 @@ bt.Next = function() {
         bt.Jump(label[command.jump]);
       }
       
+      else if (command.room) {
+        create_level(command.room);
+      }
+      
       // cutscene stuff
       else if (command.move) {
         command.move.move(command.dir, command.run);

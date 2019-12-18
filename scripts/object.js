@@ -70,8 +70,8 @@ label.xno_init = [
   player.visible = true;
   bt.adv.box.visible = true;
   inventory.mask = items.mask;
-  bt.OnEnd = () => { create_level("Jin_Island"); }
-}
+},
+{room:"Jin_Island"}
 ]
 
 label.xno_load = [

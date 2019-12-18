@@ -345,7 +345,7 @@ Player.prototype.get_input = function() {
   }
 
 function Npc({dialogue, name, image, second_dialogue, spawn_condition, mask}) {
-  this.name = name || "";
+  this.name = "";
   this.image = spr[image];
   this.dialogue = dialogue;
   this.second_dialogue = second_dialogue || false;

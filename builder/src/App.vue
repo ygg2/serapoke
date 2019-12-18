@@ -14,7 +14,11 @@
     />
     <v-content app>
       <!-- router view will be showing the block or npc w/script editor -->
-        <router-view :selected.sync="selected" :sprites="sprites" />
+      <router-view
+        :selected.sync="selected"
+        :sprites="sprites"
+        :spritedata="spriteData"
+      />
       <v-snackbar
         v-model="notifVisible"
         absolute
@@ -51,6 +55,7 @@ export default {
   data() {
     return {
       sprites: {},
+      spriteData: {},
       maps: {
         defaultmap: {
           npcs: [{ name: 'NPC', dialogue: ['sample dialogue'] }]
@@ -141,6 +146,13 @@ export default {
         this.logError(err)
         success = false
       }
+      // convert sprites to base64 strings
+      let spriteStrings = Object.keys(this.sprites)
+      for (var i = 0; i < spriteStrings.length; i++) {
+        let key = spriteStrings[i]
+        let value = this.sprites[key]
+        this.spriteData[key] = this.base64(value)
+      }
       // load maps
       let mapFile = path.join(this.projectPath, 'scripts/room.js')
       try {
@@ -184,6 +196,12 @@ export default {
         this.error = 'Cannot save without a valid project folder.'
       }
       this.isSaving = false
+    },
+    base64(spriteFile) {
+      let data = fs.readFileSync(path.join(this.projectPath, spriteFile))
+      let base64Image = Buffer.from(data, 'binary').toString('base64')
+      let imgSrcString = `data:image/png;base64,${base64Image}`
+      return imgSrcString
     }
   }
 }
@@ -202,5 +220,12 @@ export default {
   top: 0;
   width: 100%;
   height: 100%;
+}
+a {
+  text-decoration: none;
+}
+.crisp {
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
 }
 </style>
