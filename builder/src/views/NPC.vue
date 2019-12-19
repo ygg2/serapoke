@@ -43,13 +43,37 @@
               label="Spawn Condition"
               v-model="selected.spawn_condition"
             />
+            <v-list>
+              <v-subheader style="position:relative">
+                Scripts
+                <v-btn absolute right icon small @click="addScript()">
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+              </v-subheader>
+              <v-list-item
+                v-for="(scr, name) of selected.labels"
+                :key="name"
+                @click="editLabel = name"
+              >
+                <v-list-item-content>
+                  {{ name }}
+                </v-list-item-content>
+                <v-list-item-icon v-if="name == 'Main'">
+                  <v-icon small>mdi-star</v-icon>
+                </v-list-item-icon>
+              </v-list-item>
+            </v-list>
           </v-card-text>
         </v-col>
         <v-divider inset vertical />
         <v-col>
           <script-editor
-            :story.sync="selected.dialogue"
+            :story.sync="selected.labels[editLabel]"
             :name="selected.name"
+            :label="editLabel"
+            :labels="Object.keys(selected.labels)"
+            :npcs="npcs"
+            @update-name="updateScriptName"
           />
         </v-col>
       </v-row>
@@ -71,11 +95,42 @@ export default {
     spritedata: {
       type: Object,
       required: true
+    },
+    npcs: {
+      type: Array,
+      required: true
+    }
+  },
+  data() {
+    return {
+      editLabel: 'Main'
     }
   },
   computed: {
     spritePath() {
       return this.spritedata[this.selected.image]
+    }
+  },
+  watch: {
+    selected() {
+      this.editLabel = 'Main'
+    }
+  },
+  methods: {
+    addScript() {
+      this.$set(this.selected.labels, 'New Script', [''])
+      this.editLabel = 'New Script'
+    },
+    updateScriptName(name) {
+      if (!this.selected.labels[name]) {
+        this.$set(
+          this.selected.labels,
+          name,
+          this.selected.labels[this.editLabel]
+        )
+        this.$delete(this.selected.labels, this.editLabel)
+        this.editLabel = name
+      }
     }
   }
 }

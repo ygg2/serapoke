@@ -40,7 +40,7 @@ items = {
 }
 
 // player
-player = new Player(17, 14, spr.jin_nomask);
+player = new Player(17, 14, "jin_nomask");
 
 // INTRO
 label.main_menu = [

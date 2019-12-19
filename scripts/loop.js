@@ -15,6 +15,7 @@ var update = function() {
   // talking section
   else if (in_talk) {
     player.step();
+    for (let npc of npcs) npc.step();
     if (keyboard_check_pressed(keymap.confirm) || script_pause > 0) {
       bt.Next();
     }
@@ -27,6 +28,7 @@ var update = function() {
     }
     // move the player
     player.step();
+    for (let npc of npcs) npc.step();
     // talk to npcs
     if (keyboard_check_pressed(keymap.confirm)) {
       var close_npc = place_meeting(player, player.x + player.dirx, player.y + player.diry, npcs);
@@ -47,9 +49,7 @@ var render = function() {
   room.ctx.scale(2,2)
   room_background.draw();
 //  for (i=0;i<blocks.length;i++) { blocks[i].draw(); }
-  for (i=0;i<npcs.length;i++) {
-    npcs[i].draw();
-  }
+  for (let npc of npcs) npc.draw()
   player.draw();
   room.ctx.restore();
   if (in_talk) {

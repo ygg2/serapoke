@@ -1,16 +1,13 @@
 <template>
-  <v-card color="#cceeff">
+  <v-card color="#ffcccc">
     <v-card-text>
       <v-text-field
-        label="Name"
-        v-model="command.name"
-        :id="index"
-        @keyup.enter="$emit('create-next')"
-        @keyup.up.exact="$emit('focus-prev')"
-        @keyup.down.exact="$emit('focus-next')"
-        @keyup.shift.up="$emit('add-cell-prev')"
-        @keyup.shift.down="$emit('add-cell-next')"
-        @keyup.shift.enter="$emit('add-cell-next')"
+        label="pause"
+        :value="command.pause"
+        @input="updatePause"
+        type="number"
+        suffix="frames"
+        color="red"
       >
         <template v-slot:append-outer v-if="!deletePrompt">
           <v-btn icon small @click="deletePrompt = true">
@@ -37,11 +34,30 @@ export default {
     index: {
       type: String,
       required: true
+    },
+    npcs: {
+      type: Array,
+      required: true
     }
   },
   data() {
     return {
       deletePrompt: false
+    }
+  },
+  computed: {
+    nameAndIndex() {
+      return [
+        { name: 'Player', index: 0 },
+        ...this.npcs.map((npc, i) => ({ name: npc.name, index: i + 1 }))
+      ]
+    }
+  },
+  methods: {
+    updatePause(amount) {
+      let parsed = parseInt(amount, 10)
+      if (isNaN(parsed)) this.command.pause = 0
+      else this.command.pause = parsed
     }
   }
 }

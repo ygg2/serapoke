@@ -14,6 +14,7 @@ var story = [];
 var chars_displayed = 0;
 var script_pause = 0;
 const no_item = -1;
+var calling_npc = null
 
 /*base variables
 BOX_X
@@ -119,10 +120,11 @@ bt.typewriter = function(x, y, text) {
 }
 
 // bt function
-bt.Jump = function(label) {
-  story = [];
-  for (i=0;i<label.length;i++) {
-    story.push(label[i]);
+bt.Jump = function(newLabel) {
+  if (calling_npc !== null) {
+    story = [...calling_npc.labels[newLabel]]
+  } else {
+  	story = [...label[newLabel]]
   }
   bt.line = 0;
   bt.Next();
@@ -154,54 +156,6 @@ bt.Cutscene = function(arr) {
 }
 
 bt.OnEnd = null;
-
-// STRING
-// displays string as dialogue
-
-// OBJECT
-
-// name:(string) sets string as name
-
-// change:
-//   (box) sets textbox properties
-//     x:(int)
-//     y:(int)
-//     image:(string)
-//   (text) sets text properties
-//     x:(int)
-//     y:(int)
-//   (background) sets background properties
-//     image:(string) sets to blank if unspecified
-
-// pickup:
-//   (a string) name of item to add to inventory
-//     message:(string) dialogue to display on pickup
-//     after:(string) dialogue to display if already picked up
-
-// drop:
-//   (a string) name of item to drop from inventory
-//     message:(string) dialogue to display on drop
-//     backup:(string) dialogue to display if you don't have the item
-//     after:(string) dialogue to display if already dropped
-
-// transition:
-//   (fade) fades screen to black and back for 100 frames
-
-// pause:
-//   (an int) number of frames to pause for
-
-// jump:(string) jumps to string label
-
-// menu:
-//   (text) shows normal dialogue menu
-//     choices:(array) list of ["Text", "label"] for buttons
-//   (yesno) does a yes no prompt
-//     yes:(array) dialogue to display if yes is chosen
-//     no:(array) dialogue to display if no is chosen
-
-// FUNCTION
-// runs function
-// NOTE: a function or object can be provided to pickup/drop instead of dialogue
 
 bt.Next = function() {
   var go = true;
@@ -401,7 +355,7 @@ bt.Next = function() {
       }
 
       else if (command.jump) {
-        bt.Jump(label[command.jump]);
+        bt.Jump(command.jump);
       }
       
       else if (command.room) {
@@ -409,8 +363,9 @@ bt.Next = function() {
       }
       
       // cutscene stuff
-      else if (command.move) {
-        command.move.move(command.dir, command.run);
+      else if (command.move || command.move===0) {
+        if (command.move==="player") player.move(command.dir, command.run)
+        else npcs[command.move].move(command.dir, command.run);
       }
       
       else if (command.stop) {

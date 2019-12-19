@@ -231,7 +231,7 @@ Transition.prototype.wave = function(ystart, yend, spacing, amplitude, color, sh
 function Character(x, y, image) {
   this.x = x * GRIDSIZE;
   this.y = y * GRIDSIZE;
-  this.image = image;
+  this.image = spr[image];
   this.visible = true;
   this.mask = { x: 8, y: 16, width: GRIDSIZE, height: GRIDSIZE };
   this.hsp = 0;
@@ -294,7 +294,24 @@ Character.prototype = {
       }
     }
     // collision
-    if (this.hsp != 0) {
+    this.collide_and_move();
+  },
+  draw: function() {
+    if (this.visible) {
+      room.ctx.drawImage(this.image, this.x-this.mask.x, this.y-this.mask.y);
+    }
+  },
+  get_input: function() {
+    return {
+      r: keyboard_check(vk_right),
+      l: keyboard_check(vk_left),
+      u: keyboard_check(vk_up),
+      d: keyboard_check(vk_down),
+      run: keyboard_check(vk_shift)
+    }
+  },
+  collide_and_move: function() {
+  	if (this.hsp != 0) {
       for (var i = 0; i < Math.abs(this.hsp); i++) {
         if (!place_meeting(this, this.x + sign(this.hsp), this.y, blocks)) {
           this.x += sign(this.hsp);
@@ -313,20 +330,6 @@ Character.prototype = {
         }
       }
     }
-  },
-  draw: function() {
-    if (this.visible) {
-      room.ctx.drawImage(this.image, this.x-this.mask.x, this.y-this.mask.y);
-    }
-  },
-  get_input: function() {
-    return {
-      r: keyboard_check(vk_right),
-      l: keyboard_check(vk_left),
-      u: keyboard_check(vk_up),
-      d: keyboard_check(vk_down),
-      run: keyboard_check(vk_shift)
-    }
   }
 }
 
@@ -344,10 +347,11 @@ Player.prototype.get_input = function() {
     }
   }
 
-function Npc({dialogue, name, image, second_dialogue, spawn_condition, mask}) {
-  this.name = "";
-  this.image = spr[image];
-  this.dialogue = dialogue;
+function Npc({labels, name, image, second_dialogue, spawn_condition, mask}) {
+  Character.call(this, 0, 0, image)
+  this.name = name; // for debug text
+  this.labels = labels
+  this.dialogue = labels['Main'];
   this.second_dialogue = second_dialogue || false;
   this.spawn_condition = spawn_condition || false;
   this.x = 0;
@@ -366,18 +370,44 @@ function Npc({dialogue, name, image, second_dialogue, spawn_condition, mask}) {
   }
   this.talked_to = false;
   this.say = function() {
-      in_talk = true;
-      if (this.talked_to && this.second_dialogue) {
-        story = [...this.second_dialogue];
-      }
-      else {
-        story = [...this.dialogue];
-        this.talked_to = true;
-      }
-      bt.adv.name.text = this.name;
-      bt.line = 0;
-      bt.Next();
+    calling_npc = this;
+    bt.adv.name.text = "";
+    in_talk = true;
+    if (this.talked_to && this.second_dialogue) {
+      story = [...this.second_dialogue];
+    }
+    else {
+      story = [...this.dialogue];
+      this.talked_to = true;
+    }
+    bt.line = 0;
+    bt.Next();
   }
+}
+Npc.prototype = new Character();
+Npc.prototype.collide_and_move = function() {
+  if (this.hsp != 0) {
+    for (var i = 0; i < Math.abs(this.hsp); i++) {
+      if (!place_meeting(this, this.x + sign(this.hsp), this.y, nonnpcs)) {
+        this.x += sign(this.hsp);
+      } else {
+        this.hsp = 0;
+        break;
+      }
+    }
+  } else if (this.vsp != 0) {
+    for (var i = 0; i < Math.abs(this.vsp); i++) {
+      if (!place_meeting(this, this.x, this.y + sign(this.vsp), nonnpcs)) {
+        this.y += sign(this.vsp);
+      } else {
+        this.vsp = 0;
+        break;
+      }
+    }
+  }
+}
+Npc.prototype.get_input = function() {
+	return this.input
 }
 
 function Door(room, position) {
@@ -417,9 +447,10 @@ function Button(button) {
   this.image = button.image || false;
   this.label = button.label || false;
   this.hovered = false;
+  this.calling_npc = button.calling_npc || false;
   this.action = button.action || function() {
     if (this.label) {
-      bt.Jump(label[this.label]);
+      bt.Jump(this.label);
       in_menu = false;
     }
     else {
@@ -585,7 +616,7 @@ function spawn_npc(x, y, npc, solid = true) {
     npc.y = y*GRIDSIZE;
     npcs.push(npc);
     if (solid) {
-      blocks.push(new Img(x*GRIDSIZE, y*GRIDSIZE, spr.block));
+      blocks.push(npc);
     }
   }
 }
@@ -597,6 +628,7 @@ var npcs = [];
 function create_level(lvl) {
   room.map = maps[lvl].map;
   blocks = [];
+  nonnpcs = [];
   var block_id=0;
   var npc_id = 0;
   map_w = GRIDSIZE*maps[lvl].width;
@@ -605,7 +637,7 @@ function create_level(lvl) {
   for (var y=0;y<maps[lvl].height;y++) {
     for (var x=0;x<maps[lvl].width;x++) {
       if (maps[lvl].map[block_id]==1) {
-        blocks.push(new Img(x*GRIDSIZE,y*GRIDSIZE,spr.block));
+        nonnpcs.push(new Img(x*GRIDSIZE,y*GRIDSIZE,spr.block));
       }
       else if (maps[lvl].map[block_id]==5) {
         spawn_npc(x, y, new Npc(maps[lvl].npcs[npc_id]));
@@ -614,6 +646,7 @@ function create_level(lvl) {
     block_id++;
     }
   }
+  blocks.push(...nonnpcs);
   if (maps[lvl].creation_code) {
     maps[lvl].creation_code();
   }

@@ -1,11 +1,20 @@
 <template>
-  <v-card-text>
-    <p class="title d-flex align-center justify-space-between">
-      Script
-      <v-btn @click="showDocs = !showDocs" icon>
-        <v-icon color="grey">mdi-information</v-icon>
-      </v-btn>
-    </p>
+  <v-card-text style="max-height:90vh; overflow-y:scroll">
+    <v-text-field
+      solo
+      flat
+      hide-details
+      full-width
+      class="title"
+      :value="label"
+      @input="$emit('update-name', $event)"
+    >
+      <template v-slot:append-outer>
+        <v-btn @click="showDocs = !showDocs" icon>
+          <v-icon color="grey">mdi-information</v-icon>
+        </v-btn>
+      </template>
+    </v-text-field>
     <v-expand-transition>
       <div v-show="showDocs">
         <v-divider />
@@ -40,7 +49,9 @@
           <v-speed-dial
             v-if="!line"
             :value="editMenu == i"
-            @input="editMenu = i"
+            @input="editMenu = editMenu == i ? -1 : i"
+            direction="left"
+            transition="slide-x-reverse-transition"
           >
             <template v-slot:activator>
               <v-btn icon small>
@@ -48,11 +59,16 @@
                 <v-icon v-else>mdi-pencil</v-icon>
               </v-btn>
             </template>
-            <v-btn fab small dark color="green" @click="nameCell(i)">
-              <v-icon>mdi-account-card-details</v-icon>
-            </v-btn>
-            <v-btn fab small dark color="blue">
-              <v-icon>mdi-auto-fix</v-icon>
+            <v-btn
+              v-for="t of cellTypeList"
+              fab
+              small
+              dark
+              :color="t.color"
+              @click="setType(t.cellType, i)"
+              :key="t.cellType"
+            >
+              <v-icon>{{ t.icon }}</v-icon>
             </v-btn>
           </v-speed-dial>
         </template>
@@ -61,29 +77,26 @@
         <component
           :is="cellType(line)"
           :command="line"
+          :labels="labels"
+          :npcs="npcs"
           :index="name + i"
           @create-next="createNext(name, i)"
           @remove-action="removeAction(name, i)"
           @focus-next="focusNext(name, i)"
           @focus-prev="focusPrev(name, i)"
           @add-cell-next="addCellNext(name, i)"
-          @add-cell-prev="addCellPrev(name, i)"
+          @add-cell-prev="addCellPrev(i)"
           class="mb-4"
         />
       </div>
-      <div v-else>{{ typeof line }}</div>
+      <div v-else>[ Function (see actual file) ]</div>
     </div>
+    <v-btn text @click="addCell"><v-icon>mdi-plus</v-icon>New</v-btn>
   </v-card-text>
 </template>
 
 <script>
 /* need icons for
-
-:: name
-  -set name (name)
-
-:: menu
-  -menu (choices: text, label)
 
 :: items
   -pick up (item, message, after)
@@ -91,26 +104,25 @@
 
 jump to label (label)
 go to level (level name)
--pause (time in frames)
 -transition (transition name)
 change sprite (image)
 change background (image)
 change textbox (show, hide, x, y, image)
 change text (x, y)
 
-:: movement
-  -move (character)
-  -stop (character)
-
 save (no parameters. pass true.)
 
 */
 import DialogueName from '@/components/DialogueName.vue'
 import DialogueMenu from '@/components/DialogueMenu.vue'
+import DialogueMove from '@/components/DialogueMove.vue'
+import DialoguePause from '@/components/DialoguePause.vue'
 export default {
   components: {
     'dialogue-name': DialogueName,
-    'dialogue-menu': DialogueMenu
+    'dialogue-menu': DialogueMenu,
+    'dialogue-move': DialogueMove,
+    'dialogue-pause': DialoguePause
   },
   props: {
     story: {
@@ -120,6 +132,18 @@ export default {
     name: {
       type: String,
       default: 'error'
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    labels: {
+      type: Array,
+      required: true
+    },
+    npcs: {
+      type: Array,
+      required: true
     }
   },
   data() {
@@ -135,13 +159,37 @@ export default {
         ['Down Arrow', 'Next cell'],
         ['Shift + Enter or Down', 'Add cell below'],
         ['Shift + Up', 'Add cell above']
+      ],
+      cellTypeList: [
+        {
+          color: 'red',
+          cellType: 'pause',
+          icon: 'mdi-pause'
+        },
+        {
+          color: 'green',
+          cellType: 'move',
+          icon: 'mdi-arrow-all'
+        },
+        {
+          color: 'purple',
+          cellType: 'menu',
+          icon: 'mdi-menu'
+        },
+        {
+          color: 'blue',
+          cellType: 'name',
+          icon: 'mdi-account-card-details'
+        }
       ]
     }
   },
   methods: {
     cellType(line) {
       if (line.name || line.name === '') return 'dialogue-name'
-      else return 'dialogue-menu'
+      else if (line.menu) return 'dialogue-menu'
+      else if (line.move) return 'dialogue-move'
+      else if (line.pause || line.pause === 0) return 'dialogue-pause'
     },
     addCell() {
       this.story.push('')
@@ -183,8 +231,22 @@ export default {
         this.focusPrev(npc, index)
       }
     },
-    nameCell(index) {
-      this.story.splice(index, 1, { name: '' })
+    setType(name, index) {
+      this.editMenu = -1
+      switch (name) {
+        case 'name':
+          this.story.splice(index, 1, { name: '' })
+          break
+        case 'menu':
+          this.story.splice(index, 1, { menu: 'text', choices: [['']] })
+          break
+        case 'move':
+          this.story.splice(index, 1, { move: 'player', dir: 's', run: false })
+          break
+        case 'pause':
+          this.story.splice(index, 1, { pause: 60 })
+          break
+      }
     }
   }
 }

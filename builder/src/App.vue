@@ -18,6 +18,7 @@
         :selected.sync="selected"
         :sprites="sprites"
         :spritedata="spriteData"
+        :npcs="selectedNPCs"
       />
       <v-snackbar
         v-model="notifVisible"
@@ -81,6 +82,10 @@ export default {
       if (!this.selectedMap) return { nomap: true, nonpcs: true }
       if (!this.maps[this.selectedMap].npcs.length) return { nonpcs: true }
       return this.maps[this.selectedMap].npcs[this.selectedNPC]
+    },
+    selectedNPCs() {
+      if (!this.selectedMap) return []
+      return this.maps[this.selectedMap].npcs
     }
   },
   mounted() {
