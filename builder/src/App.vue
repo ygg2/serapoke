@@ -19,6 +19,7 @@
         :sprites="sprites"
         :spritedata="spriteData"
         :npcs="selectedNPCs"
+        :map="computedMap"
       />
       <v-snackbar
         v-model="notifVisible"
@@ -64,7 +65,7 @@ export default {
       },
       selectedMap: 'defaultmap',
       selectedNPC: 0,
-      tileset: '',
+      tileset: [],
       projectPath: '',
       error: '',
       errorLog: [],
@@ -86,6 +87,9 @@ export default {
     selectedNPCs() {
       if (!this.selectedMap) return []
       return this.maps[this.selectedMap].npcs
+    },
+    computedMap() {
+      return this.selectedMap ? this.maps[this.selectedMap] : { nomap: true }
     }
   },
   mounted() {
@@ -232,5 +236,10 @@ a {
 .crisp {
   image-rendering: crisp-edges;
   image-rendering: pixelated;
+}
+.top-left {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 </style>

@@ -1,28 +1,16 @@
 <template>
   <v-navigation-drawer permanent app>
     <v-container style="text-align:center">
-      <v-btn-toggle v-model="placing" dense>
+      <v-btn-toggle v-model="placing" mandatory dense>
         <v-btn>Tiles</v-btn>
         <v-btn>Objects</v-btn>
       </v-btn-toggle>
-      <v-row>
-        <v-col cols="3">
-          <v-text-field label="Width" type="number" dense hide-details />
-        </v-col>
-        <v-col cols="3">
-          <v-text-field label="Height" type="number" dense hide-details />
-        </v-col>
-        <v-col>
-          <v-text-field
-            label="Tileset"
-            :value="tileset"
-            @input="$emit('update:tileset', $event)"
-            dense
-            hide-details
-          />
-        </v-col>
-      </v-row>
     </v-container>
+    <tile-controls
+      v-show="placing == 0"
+      :tileset="tileset"
+      @update:tileset="emit('update:tileset', $event)"
+    />
     <object-list
       v-show="placing == 1"
       :map="computedMap"
@@ -78,14 +66,16 @@
 </template>
 
 <script>
+import TileControls from '@/components/TileControls.vue'
 import ObjectList from '@/components/ObjectList.vue'
 export default {
   components: {
+    'tile-controls': TileControls,
     'object-list': ObjectList
   },
   props: {
     tileset: {
-      type: String,
+      type: Array,
       required: true
     },
     maps: {

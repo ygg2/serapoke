@@ -347,15 +347,15 @@ Player.prototype.get_input = function() {
     }
   }
 
-function Npc({labels, name, image, second_dialogue, spawn_condition, mask}) {
+function Npc({labels, name, image, x, y, spawn_condition, mask}) {
   Character.call(this, 0, 0, image)
   this.name = name; // for debug text
   this.labels = labels
   this.dialogue = labels['Main'];
-  this.second_dialogue = second_dialogue || false;
+  this.secondary = labels['Secondary'] || labels['Main']
   this.spawn_condition = spawn_condition || false;
-  this.x = 0;
-  this.y = 0;
+  this.x = x || 0;
+  this.y = y || 0;
   this.mask = mask || {
     x: 0,
     y: 0,
@@ -373,8 +373,8 @@ function Npc({labels, name, image, second_dialogue, spawn_condition, mask}) {
     calling_npc = this;
     bt.adv.name.text = "";
     in_talk = true;
-    if (this.talked_to && this.second_dialogue) {
-      story = [...this.second_dialogue];
+    if (this.talked_to && this.secondary) {
+      story = [...this.secondary];
     }
     else {
       story = [...this.dialogue];
@@ -610,10 +610,10 @@ Menu.prototype.update_choice = function() {
   }
 }
 
-function spawn_npc(x, y, npc, solid = true) {
+function spawn_npc(npc, solid = true) {
   if (!npc.spawn_condition || landscape[npc.spawn_condition]) {
-    npc.x = x*GRIDSIZE;
-    npc.y = y*GRIDSIZE;
+    npc.x *= GRIDSIZE;
+    npc.y *= GRIDSIZE;
     npcs.push(npc);
     if (solid) {
       blocks.push(npc);
@@ -634,14 +634,13 @@ function create_level(lvl) {
   map_w = GRIDSIZE*maps[lvl].width;
   map_h = GRIDSIZE*maps[lvl].height;
   room_background.image = spr[maps[lvl].background];
+  for (let npc of maps[lvl].npcs) {
+    spawn_npc(new Npc(npc));
+  }
   for (var y=0;y<maps[lvl].height;y++) {
     for (var x=0;x<maps[lvl].width;x++) {
       if (maps[lvl].map[block_id]==1) {
         nonnpcs.push(new Img(x*GRIDSIZE,y*GRIDSIZE,spr.block));
-      }
-      else if (maps[lvl].map[block_id]==5) {
-        spawn_npc(x, y, new Npc(maps[lvl].npcs[npc_id]));
-        npc_id++;
       }
     block_id++;
     }

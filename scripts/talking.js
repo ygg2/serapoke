@@ -186,6 +186,7 @@ bt.Next = function() {
         bt.OnEnd();
         bt.OnEnd = null;
       }
+      player.stop()
     }
 
     // if we encounter a string then stop

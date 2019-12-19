@@ -48,7 +48,7 @@ var render = function() {
   room.ctx.translate(-drawx*2,-drawy*2);
   room.ctx.scale(2,2)
   room_background.draw();
-//  for (i=0;i<blocks.length;i++) { blocks[i].draw(); }
+//  for (let block of blocks) { block.draw(); }
   for (let npc of npcs) npc.draw()
   player.draw();
   room.ctx.restore();
