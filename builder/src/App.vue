@@ -5,21 +5,33 @@
       :maps="maps"
       :map.sync="selectedMap"
       :npc.sync="selectedNPC"
+      :object-type.sync="objtype"
       :error="error"
       :loading="isLoading"
       :saving="isSaving"
       @save-map="saveStuff"
       @change-project-folder="changeProjectFolder"
       @show-error-log="showErrorLog = true"
+      @open-npc-editor="currentEditor = 'npc-editor'"
     />
     <v-content app>
-      <!-- router view will be showing the block or npc w/script editor -->
-      <router-view
+      <room-editor
+        :map="computedMap"
+        :spritedata="spriteData"
+        :objtype="objtype"
+        :npcs="selectedNPCs"
+        @set-npc="selectedNPC = $event"
+        @open-npc-editor="currentEditor = 'npc-editor'"
+      />
+      <component
+        :is="currentEditor"
         :selected.sync="selected"
         :sprites="sprites"
         :spritedata="spriteData"
         :npcs="selectedNPCs"
         :map="computedMap"
+        :objtype="objtype"
+        @open-room-editor="currentEditor = 'no-editor'"
       />
       <v-snackbar
         v-model="notifVisible"
@@ -45,6 +57,9 @@
 
 <script>
 import NavBar from '@/components/NavBar.vue'
+import RoomEditor from '@/components/RoomEditor.vue'
+import NPC from '@/components/NPC.vue'
+import MainControls from '@/components/MainControls.vue'
 var fs = require('fs')
 const fsprom = fs.promises
 var path = require('path')
@@ -52,10 +67,14 @@ const { app, dialog } = require('electron').remote
 
 export default {
   components: {
-    'nav-bar': NavBar
+    'nav-bar': NavBar,
+    'room-editor': RoomEditor,
+    'npc-editor': NPC,
+    'no-editor': MainControls
   },
   data() {
     return {
+      currentEditor: 'no-editor',
       sprites: {},
       spriteData: {},
       maps: {
@@ -65,6 +84,7 @@ export default {
       },
       selectedMap: 'defaultmap',
       selectedNPC: 0,
+      objtype: 0,
       tileset: [],
       projectPath: '',
       error: '',

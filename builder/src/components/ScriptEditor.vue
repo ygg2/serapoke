@@ -37,7 +37,7 @@
         :id="name + i"
         @keyup.enter.exact="createNext(name, i)"
         @keydown.backspace="lineBeforeBackspace = line"
-        @keyup.backspace="removeAction(name, i)"
+        @keyup.backspace="removeSpecial(name, i)"
         @keyup.down.exact="focusNext(name, i)"
         @keyup.up.exact="focusPrev(name, i)"
         @keyup.shift.down="addCellNext(name, i)"
@@ -81,7 +81,7 @@
           :npcs="npcs"
           :index="name + i"
           @create-next="createNext(name, i)"
-          @remove-action="removeAction(name, i)"
+          @remove-action="removeCell(name, i)"
           @focus-next="focusNext(name, i)"
           @focus-prev="focusPrev(name, i)"
           @add-cell-next="addCellNext(name, i)"
@@ -203,6 +203,15 @@ export default {
         this.focusNext(npc, index)
       })
     },
+    removeCell(npc, index) {
+      this.story.splice(index, 1)
+    },
+    removeSpecial(npc, index) {
+      if (this.lineBeforeBackspace == '' && this.story.length > 1) {
+        this.story.splice(index, 1)
+        this.focusPrev(npc, index)
+      }
+    },
     createNext(npc, index) {
       if (!this.focusNext(npc, index)) {
         this.addCell()
@@ -223,12 +232,6 @@ export default {
       let elem = document.getElementById(npc + String(index - 1))
       if (elem) {
         elem.focus()
-      }
-    },
-    removeAction(npc, index) {
-      if (this.lineBeforeBackspace == '' && this.story.length > 1) {
-        this.story.splice(index, 1)
-        this.focusPrev(npc, index)
       }
     },
     setType(name, index) {

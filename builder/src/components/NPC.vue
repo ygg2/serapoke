@@ -1,8 +1,6 @@
 <template>
   <v-row align="center" justify="center">
-    <router-link to="/">
-      <div class="full-cover" />
-    </router-link>
+    <div class="full-cover" @click="$emit('open-room-editor')" />
     <v-card raised style="width:80%;" class="mt-4">
       <v-row v-if="selected.nonpcs" no-gutters>
         <v-card-text>This map has no npcs.</v-card-text>
@@ -13,7 +11,8 @@
             <v-text-field
               label="Name"
               placeholder="Name"
-              v-model="selected.name"
+              :value="selected.name"
+              @input="updateName"
               outlined
               hide-details
             />
@@ -54,6 +53,7 @@
                 v-for="(scr, name) of selected.labels"
                 :key="name"
                 @click="editLabel = name"
+                @contextmenu.prevent="showRemovePrompt(name)"
               >
                 <v-list-item-content>
                   {{ name }}
@@ -61,8 +61,12 @@
                 <v-list-item-icon v-if="name == 'Main'">
                   <v-icon small>mdi-star</v-icon>
                 </v-list-item-icon>
+                <v-list-item-icon v-if="name == 'Secondary'">
+                  <v-icon small>mdi-star-outline</v-icon>
+                </v-list-item-icon>
               </v-list-item>
             </v-list>
+            <delete-menu v-model="removePrompt" @remove="removeScript" />
           </v-card-text>
         </v-col>
         <v-divider inset vertical />
@@ -82,9 +86,11 @@
 </template>
 
 <script>
+import DeleteMenu from '@/components/DeleteMenu.vue'
 import ScriptEditor from '@/components/ScriptEditor.vue'
 export default {
   components: {
+    'delete-menu': DeleteMenu,
     'script-editor': ScriptEditor
   },
   props: {
@@ -103,6 +109,8 @@ export default {
   },
   data() {
     return {
+      removing: '',
+      removePrompt: false,
       editLabel: 'Main'
     }
   },
@@ -117,9 +125,21 @@ export default {
     }
   },
   methods: {
+    updateName(name) {
+      let npcMatch = false
+      for (let npc of this.npcs) {
+        if (name == npc.name) npcMatch = true
+      }
+      if (name && !npcMatch) this.selected.name = name
+    },
     addScript() {
       this.$set(this.selected.labels, 'New Script', [''])
       this.editLabel = 'New Script'
+    },
+    removeScript() {
+      this.$delete(this.selected.labels, this.removing)
+      this.editLabel = 'Main'
+      this.removing = 'Main'
     },
     updateScriptName(name) {
       if (!this.selected.labels[name]) {
@@ -130,6 +150,12 @@ export default {
         )
         this.$delete(this.selected.labels, this.editLabel)
         this.editLabel = name
+      }
+    },
+    showRemovePrompt(name) {
+      if (name != 'Main') {
+        this.removePrompt = true
+        this.removing = name
       }
     }
   }

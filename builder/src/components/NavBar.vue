@@ -14,7 +14,8 @@
     <object-list
       v-show="placing == 1"
       :map="computedMap"
-      @update:npc="$emit('update:npc', $event)"
+      @update:npc="updateNPC"
+      @update:object-type="$emit('update:object-type', $event)"
     />
     <v-container class="fixed-bottom">
       <v-row dense>
@@ -112,6 +113,12 @@ export default {
   computed: {
     computedMap() {
       return this.map ? this.maps[this.map] : { nomap: true }
+    }
+  },
+  methods: {
+    updateNPC(newNPC) {
+      this.$emit('update:npc', newNPC)
+      this.$emit('open-npc-editor')
     }
   }
 }

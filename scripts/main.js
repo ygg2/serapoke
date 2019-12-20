@@ -137,6 +137,8 @@ function Preload() {
         create_objects();
         // first room is a title screen
         create_level("Title");
+        player.x = XSIZE / 2;
+        player.y = YSIZE / 2;
         in_talk = true;
         story = label.main_menu;
         bt.Next();
@@ -629,20 +631,19 @@ function create_level(lvl) {
   room.map = maps[lvl].map;
   blocks = [];
   nonnpcs = [];
-  var block_id=0;
-  var npc_id = 0;
-  map_w = GRIDSIZE*maps[lvl].width;
-  map_h = GRIDSIZE*maps[lvl].height;
+  map_w = GRIDSIZE * maps[lvl].map[0].length;
+  map_h = GRIDSIZE * maps[lvl].map.length;
+  if (map_w < XSIZE) map_w = XSIZE;
+  if (map_h < YSIZE) map_h = YSIZE;
   room_background.image = spr[maps[lvl].background];
   for (let npc of maps[lvl].npcs) {
     spawn_npc(new Npc(npc));
   }
-  for (var y=0;y<maps[lvl].height;y++) {
-    for (var x=0;x<maps[lvl].width;x++) {
-      if (maps[lvl].map[block_id]==1) {
+  for (var y = 0; y < maps[lvl].map.length; y++) {
+    for (var x = 0; x < maps[lvl].map[y].length; x++ ) {
+      if (maps[lvl].map[y][x]==1) {
         nonnpcs.push(new Img(x*GRIDSIZE,y*GRIDSIZE,spr.block));
       }
-    block_id++;
     }
   }
   blocks.push(...nonnpcs);

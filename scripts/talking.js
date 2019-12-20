@@ -365,7 +365,18 @@ bt.Next = function() {
       
       // cutscene stuff
       else if (command.move || command.move===0) {
-        if (command.move==="player") player.move(command.dir, command.run)
+        if (command.teleport) {
+          if (command.move==="player") {
+          	if (command.x || command.x===0) player.x = command.x * GRIDSIZE;
+          	if (command.y || command.y===0) player.y = command.y * GRIDSIZE;
+          } else {
+            if (command.x || command.x===0)
+              npcs[command.move].x = command.x * GRIDSIZE;
+            if (command.y || command.y===0)
+              npcs[command.move].y = command.y * GRIDSIZE;
+          }
+        }
+        else if (command.move==="player") player.move(command.dir, command.run)
         else npcs[command.move].move(command.dir, command.run);
       }
       

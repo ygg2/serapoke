@@ -40,7 +40,7 @@ items = {
 }
 
 // player
-player = new Player(17, 14, "jin_nomask");
+player = new Player(0, 0, "jin_nomask");
 
 // INTRO
 label.main_menu = [
@@ -66,6 +66,7 @@ label.xno_intro = [
 ]
 label.xno_init = [
 {change:text, x:80, y:400},
+{move:'player', teleport:true, x:17, y:14},
 ()=>{
   player.visible = true;
   bt.adv.box.visible = true;
