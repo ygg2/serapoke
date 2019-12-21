@@ -647,6 +647,8 @@ function create_level(lvl) {
     }
   }
   blocks.push(...nonnpcs);
+  player.x = GRIDSIZE * maps[lvl].spawnx || 0;
+  player.y = GRIDSIZE * maps[lvl].spawny || 0;
   if (maps[lvl].creation_code) {
     maps[lvl].creation_code();
   }

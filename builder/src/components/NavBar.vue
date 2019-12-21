@@ -2,17 +2,25 @@
   <v-navigation-drawer permanent app>
     <v-container style="text-align:center">
       <v-btn-toggle v-model="placing" mandatory dense>
-        <v-btn>Tiles</v-btn>
+        <v-btn>Sprites</v-btn>
+        <v-btn>Map</v-btn>
         <v-btn>Objects</v-btn>
       </v-btn-toggle>
     </v-container>
-    <tile-controls
+    <sprite-controls
       v-show="placing == 0"
+      :sprites="sprites"
+      :spritedata="spritedata"
+      @create-sprite="$emit('create-sprite')"
+    />
+    <tile-controls
+      v-show="placing == 1"
       :tileset="tileset"
-      @update:tileset="emit('update:tileset', $event)"
+      @update:tileset="$emit('update:tileset', $event)"
+      :map="computedMap"
     />
     <object-list
-      v-show="placing == 1"
+      v-show="placing == 2"
       :map="computedMap"
       @update:npc="updateNPC"
       @update:object-type="$emit('update:object-type', $event)"
@@ -67,14 +75,24 @@
 </template>
 
 <script>
+import SpriteControls from '@/components/SpriteControls.vue'
 import TileControls from '@/components/TileControls.vue'
 import ObjectList from '@/components/ObjectList.vue'
 export default {
   components: {
+    'sprite-controls': SpriteControls,
     'tile-controls': TileControls,
     'object-list': ObjectList
   },
   props: {
+    sprites: {
+      type: Object,
+      required: true
+    },
+    spritedata: {
+      type: Object,
+      required: true
+    },
     tileset: {
       type: Array,
       required: true

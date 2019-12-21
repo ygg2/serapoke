@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined>
+  <v-card flat max-height="500" style="overflow:scroll">
     <v-radio-group
       v-model="objtype"
       @change="$emit('update:object-type', $event)"

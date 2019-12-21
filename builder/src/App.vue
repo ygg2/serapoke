@@ -1,6 +1,8 @@
 <template>
   <v-app id="app">
     <nav-bar
+      :spritedata="spriteData"
+      :sprites="sprites"
       :tileset.sync="tileset"
       :maps="maps"
       :map.sync="selectedMap"
@@ -14,6 +16,7 @@
       @show-error-log="showErrorLog = true"
       @open-npc-editor="currentEditor = 'npc-editor'"
       @create-map="currentEditor = 'new-map-editor'"
+      @create-sprite="currentEditor = 'new-sprite-editor'"
     />
     <v-content app>
       <room-editor
@@ -34,6 +37,7 @@
         :objtype="objtype"
         @open-room-editor="currentEditor = 'no-editor'"
         @add-map="addMap"
+        @add-sprite="addSprite"
       />
       <v-snackbar
         v-model="notifVisible"
@@ -63,6 +67,7 @@ import RoomEditor from '@/components/RoomEditor.vue'
 import NPC from '@/components/NPC.vue'
 import MainControls from '@/components/MainControls.vue'
 import NewMapEditor from '@/components/NewMapEditor.vue'
+import NewSpriteEditor from '@/components/NewSpriteEditor.vue'
 var fs = require('fs')
 const fsprom = fs.promises
 var path = require('path')
@@ -73,6 +78,7 @@ export default {
     'nav-bar': NavBar,
     'room-editor': RoomEditor,
     'new-map-editor': NewMapEditor,
+    'new-sprite-editor': NewSpriteEditor,
     'npc-editor': NPC,
     'no-editor': MainControls
   },
@@ -127,10 +133,11 @@ export default {
     }
   },
   methods: {
-    addMap({ name, width, height }) {
+    addMap({ name, width, height, background }) {
       this.$set(this.maps, name, {
         map: [],
-        npcs: []
+        background: background,
+        npcs: [],
       })
       for (var i = 0; i < height; i++) {
         this.maps[name].map.push([])
@@ -142,6 +149,11 @@ export default {
       this.$nextTick(() => {
         this.selectedMap = name
       })
+    },
+    addSprite({ name, image }) {
+      this.$set(this.sprites, name, image)
+      this.$set(this.spriteData, name, this.base64(image))
+      this.currentEditor = 'no-editor'
     },
     showNotif(message, error = true) {
       // log an error in the error log

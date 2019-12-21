@@ -29,7 +29,6 @@ function create_objects() {
 //testing
 for (let key of Object.keys(maps)) {
   label[key] = [
-    {move:'player', teleport:true, x:17, y:14},
     ()=>{
       player.visible = true;
       bt.adv.box.visible = true;
