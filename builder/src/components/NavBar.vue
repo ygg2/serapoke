@@ -20,7 +20,7 @@
     <v-container class="fixed-bottom">
       <v-row dense>
         <v-col cols="2">
-          <v-btn icon color="green">
+          <v-btn @click="$emit('create-map')" icon color="green">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </v-col>

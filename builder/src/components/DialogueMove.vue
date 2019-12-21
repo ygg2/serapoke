@@ -26,8 +26,8 @@
         </v-col>
         <v-col class="pt-0">
           <v-row v-if="command.teleport" class="mr-1">
-            <v-text-field :value="command.x" label="X" @input="updateX" />
-            <v-text-field :value="command.y" label="Y" @input="updateY" />
+            <number-input v-model="command.x" label="X" />
+            <number-input v-model="command.y" label="Y" />
           </v-row>
           <v-radio-group v-else v-model="command.dir">
             <v-radio label="Up" value="u" />
@@ -44,10 +44,12 @@
 </template>
 
 <script>
-import deleteMenu from '@/components/DeleteMenu.vue'
+import NumberInput from '@/components/NumberInput.vue'
+import DeleteMenu from '@/components/DeleteMenu.vue'
 export default {
   components: {
-    'delete-menu': deleteMenu
+    'number-input': NumberInput,
+    'delete-menu': DeleteMenu
   },
   props: {
     command: {
@@ -74,18 +76,6 @@ export default {
         { name: 'Player', value: 'player' },
         ...this.npcs.map((npc, i) => ({ name: npc.name, value: i }))
       ]
-    }
-  },
-  methods: {
-    updateX(amount) {
-      let parsed = parseInt(amount, 10)
-      if (isNaN(parsed)) this.command.x = false
-      else this.command.x = parsed
-    },
-    updateY(amount) {
-      let parsed = parseInt(amount, 10)
-      if (isNaN(parsed)) this.command.y = ''
-      else this.command.y = parsed
     }
   }
 }

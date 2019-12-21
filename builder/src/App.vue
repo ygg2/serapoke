@@ -13,6 +13,7 @@
       @change-project-folder="changeProjectFolder"
       @show-error-log="showErrorLog = true"
       @open-npc-editor="currentEditor = 'npc-editor'"
+      @create-map="currentEditor = 'new-map-editor'"
     />
     <v-content app>
       <room-editor
@@ -32,6 +33,7 @@
         :map="computedMap"
         :objtype="objtype"
         @open-room-editor="currentEditor = 'no-editor'"
+        @add-map="addMap"
       />
       <v-snackbar
         v-model="notifVisible"
@@ -60,6 +62,7 @@ import NavBar from '@/components/NavBar.vue'
 import RoomEditor from '@/components/RoomEditor.vue'
 import NPC from '@/components/NPC.vue'
 import MainControls from '@/components/MainControls.vue'
+import NewMapEditor from '@/components/NewMapEditor.vue'
 var fs = require('fs')
 const fsprom = fs.promises
 var path = require('path')
@@ -69,6 +72,7 @@ export default {
   components: {
     'nav-bar': NavBar,
     'room-editor': RoomEditor,
+    'new-map-editor': NewMapEditor,
     'npc-editor': NPC,
     'no-editor': MainControls
   },
@@ -79,6 +83,7 @@ export default {
       spriteData: {},
       maps: {
         defaultmap: {
+          map: [[]],
           npcs: [{ name: 'NPC', dialogue: ['sample dialogue'] }]
         }
       },
@@ -122,6 +127,22 @@ export default {
     }
   },
   methods: {
+    addMap({ name, width, height }) {
+      this.$set(this.maps, name, {
+        map: [],
+        npcs: []
+      })
+      for (var i = 0; i < height; i++) {
+        this.maps[name].map.push([])
+        for (var j = 0; j < width; j++) {
+          this.maps[name].map[i].push(0)
+        }
+      }
+      this.currentEditor = 'no-editor'
+      this.$nextTick(() => {
+        this.selectedMap = name
+      })
+    },
     showNotif(message, error = true) {
       // log an error in the error log
       if (error) {

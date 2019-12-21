@@ -1,5 +1,5 @@
 <template>
-  <p>No Editor</p>
+  <p>You can edit on top of this</p>
 </template>
 
 <script>

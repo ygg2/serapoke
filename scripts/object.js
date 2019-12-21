@@ -17,17 +17,32 @@ var landscape = {
 var progress = 0;
 if (localStorage.getItem('save')) {
   var main_menu_item = [
-		["CONTINUE", "xno_load"],
-  	["SKIP INTRO", "xno_init"],
+		["CONTINUE", "serapoke_load"]
   ]
 } else {
   var main_menu_item = [
-	  ["PLAY", "xno_intro"],
-  	["SKIP INTRO", "xno_init"],
+	  ["PLAY", "serapoke_intro"]
   ]
 }
 
 function create_objects() {
+//testing
+for (let key of Object.keys(maps)) {
+  label[key] = [
+    {move:'player', teleport:true, x:17, y:14},
+    ()=>{
+      player.visible = true;
+      bt.adv.box.visible = true;
+    },
+    {room:key}
+  ]
+  main_menu_item.push(
+    [key, key]
+  )
+}
+
+
+
 items = {
   journal: {
     name: "Journal",
@@ -53,18 +68,17 @@ label.main_menu = [
 	choices: main_menu_item
 },
 ]
-label.xno_intro = [
+label.serapoke_intro = [
 {change:background},
 {change:text, x:80, y:150},
-"After Lora passed away, Jin was a sad and bitter man.",
-"There were many paths Jin could choose to take,@but he decided to continue to live as he believed@Lora would have - to dedicate his life to helping@others.",
-"So, after renovating his house on the island that@had broken off Torna, he set out...",
-"...",
+"Look at this totally epic opening text.",
+"Anyway, thank you for working with me! Definitely@can't do this on my own and I appreciate you a ton.",
+"I hope you have fun too!",
 {transition:"fade"},
 {pause:50},
-{jump:"xno_init"}
+{jump:"serapoke_init"}
 ]
-label.xno_init = [
+label.serapoke_init = [
 {change:text, x:80, y:400},
 {move:'player', teleport:true, x:17, y:14},
 ()=>{
@@ -75,7 +89,7 @@ label.xno_init = [
 {room:"Jin_Island"}
 ]
 
-label.xno_load = [
+label.serapoke_load = [
 () => {
   var _save = JSON.parse(localStorage.getItem('save'));
   create_level(_save.map);

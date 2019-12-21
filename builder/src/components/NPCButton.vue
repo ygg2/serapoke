@@ -1,6 +1,11 @@
 <template>
   <div :style="npcPos">
-    <block-button :block="2" @add-object="$emit('view-npc')" />
+    <block-button
+      :block="2"
+      :image="spritedata[npc.image]"
+      @add-object="$emit('view-npc')"
+      @remove-object="$emit('remove-npc')"
+    />
   </div>
 </template>
 
@@ -11,6 +16,10 @@ export default {
     'block-button': BlockButton
   },
   props: {
+    spritedata: {
+      type: Object,
+      required: true
+    },
     npc: {
       type: Object,
       required: true
@@ -23,7 +32,7 @@ export default {
   computed: {
     npcPos() {
       let left = this.blocksize * this.npc.x || 0
-      let top = this.blocksize * this.npc.y || 0
+      let top = (this.blocksize * this.npc.y || 0) + 1 // figure out why later
       let pos = {
         position: 'absolute',
         left: left.toString() + 'px',

@@ -12,8 +12,10 @@
       v-for="(npc, i) of map.npcs"
       :key="npc.name"
       :npc="npc"
+      :spritedata="spritedata"
       :blocksize="blocksize"
       @view-npc="viewNPC(i)"
+      @remove-npc="promptRemoveNPC(npc.name, i)"
     />
     <v-row v-show="creatingNPC" align="center" justify="center">
       <div class="full-cover" @click="creatingNPC = false" />
@@ -48,16 +50,27 @@
         </v-card-text>
       </v-card>
     </v-row>
+    <v-row v-show="deletePrompt" align="center" justify="center">
+      <div class="full-cover" @click="deletePrompt = false" />
+      <v-card raised style="width:80%;" class="mt-4">
+        <v-card-title>Permanently delete {{ npcToRemove }}?</v-card-title>
+        <v-card-text>
+          <delete-menu v-model="deletePrompt" @remove="removeNPC" />
+        </v-card-text>
+      </v-card>
+    </v-row>
   </div>
 </template>
 
 <script>
 import BlockButton from '@/components/BlockButton.vue'
 import NPCButton from '@/components/NPCButton.vue'
+import DeleteMenu from '@/components/DeleteMenu.vue'
 export default {
   components: {
     'block-button': BlockButton,
-    'npc-button': NPCButton
+    'npc-button': NPCButton,
+    'delete-menu': DeleteMenu
   },
   props: {
     map: {
@@ -87,6 +100,9 @@ export default {
       moveExisting: false,
       npcName: '',
       npcToMove: '',
+      npcToRemove: '',
+      indexToRemove: -1,
+      deletePrompt: false,
       npcX: 0,
       npcY: 0,
       displayX: {
@@ -108,6 +124,14 @@ export default {
     }
   },
   methods: {
+    promptRemoveNPC(name, index) {
+      this.npcToRemove = name
+      this.indexToRemove = index
+      this.deletePrompt = true
+    },
+    removeNPC() {
+      if (this.indexToRemove != -1) this.npcs.splice(this.indexToRemove, 1)
+    },
     addObject(x, y) {
       // types: 0 - block, 1 - npc, 2 - door
       switch (this.objtype) {

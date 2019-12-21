@@ -1,5 +1,11 @@
 <template>
-  <button @click="$emit('add-object')" :style="blockStyle" />
+  <button
+    @click="$emit('add-object')"
+    @contextmenu="$emit('remove-object')"
+    :style="blockStyle"
+  >
+    <img v-if="image" :src="image" :style="maskStyle" />
+  </button>
 </template>
 
 <script>
@@ -8,6 +14,10 @@ export default {
     block: {
       type: Number,
       default: 0
+    },
+    image: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -19,6 +29,13 @@ export default {
           return { background: '#00ff0055' }
       }
       return {}
+    },
+    maskStyle() {
+      return {
+        position: 'absolute',
+        left: '0',
+        top: '0'
+      }
     }
   }
 }
