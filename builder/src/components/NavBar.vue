@@ -124,7 +124,7 @@ export default {
   },
   data() {
     return {
-      placing: 1,
+      placing: 2,
       selectedMap: ''
     }
   },

@@ -9,7 +9,11 @@
       </v-list-item-content>
     </v-list-item>
     <v-list max-width="100%" dense>
-      <v-list-item v-for="(spr, name) of sprites" :key="name">
+      <v-list-item
+        v-for="(spr, name) of sprites"
+        :key="name"
+        @click="$emit('edit-sprite', name)"
+      >
         <v-list-item-avatar>
           <img :src="spritedata[name]" />
         </v-list-item-avatar>

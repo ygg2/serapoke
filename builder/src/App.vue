@@ -20,6 +20,7 @@
     />
     <v-content app>
       <room-editor
+        :maps="maps"
         :map="computedMap"
         :spritedata="spriteData"
         :objtype="objtype"
@@ -138,6 +139,7 @@ export default {
         map: [],
         background: background,
         npcs: [],
+        doors: []
       })
       for (var i = 0; i < height; i++) {
         this.maps[name].map.push([])

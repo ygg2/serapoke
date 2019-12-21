@@ -27,6 +27,8 @@ export default {
           return { background: '#00000055' }
         case 2:
           return { background: '#00ff0055' }
+        case 3:
+          return { background: '#ff000077' }
       }
       return {}
     },

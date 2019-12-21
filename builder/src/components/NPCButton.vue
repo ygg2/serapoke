@@ -1,7 +1,7 @@
 <template>
   <div :style="npcPos">
     <block-button
-      :block="2"
+      :block="block"
       :image="spritedata[npc.image]"
       @add-object="$emit('view-npc')"
       @remove-object="$emit('remove-npc')"
@@ -16,6 +16,10 @@ export default {
     'block-button': BlockButton
   },
   props: {
+    block: {
+      type: Number,
+      default: 2
+    },
     spritedata: {
       type: Object,
       required: true

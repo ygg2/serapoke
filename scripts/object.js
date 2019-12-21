@@ -3,8 +3,6 @@
 var player;
 
 // containers
-var npc = {};
-var door = {};
 var label = {};
 var inventory = {};
 var quests = {};
@@ -98,11 +96,6 @@ label.serapoke_load = [
   player.visible = true;
 }
 ]
-
-
-// Npc(dialogue, options)
-// options: name, second_dialogue, image, spawn_condition
-// Door(room, position)
 
 /* Menu code */
 

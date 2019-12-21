@@ -412,26 +412,25 @@ Npc.prototype.get_input = function() {
 	return this.input
 }
 
-function Door(room, position) {
-  this.room = room;
-  // position the player will jump to in the new map, in an object
-  this.position = position || false;
-  this.x = 0;
-  this.y = 0;
+function Door({x, y, toMap, toX, toY}) {
+  this.x = x;
+  this.y = y;
+  this.toMap = toMap;
+  this.toX = toX;
+  this.toY = toY;
   this.mask = {
     x: 0,
     y: 0,
     width: GRIDSIZE,
     height: GRIDSIZE
   };
+  this.step = function() {};
   this.draw = function() {};
   this.cutscene = false;
   this.say = function() {
-    create_level(this.room);
-    if (this.position) {
-      player.x = this.position.x*GRIDSIZE;
-      player.y = this.position.y*GRIDSIZE;
-    }
+    create_level(this.toMap);
+    player.x = this.toX*GRIDSIZE;
+    player.y = this.toY*GRIDSIZE;
     if (this.cutscene) {
       this.cutscene();
     }
@@ -638,6 +637,9 @@ function create_level(lvl) {
   room_background.image = spr[maps[lvl].background];
   for (let npc of maps[lvl].npcs) {
     spawn_npc(new Npc(npc));
+  }
+  for (let door of maps[lvl].doors) {
+    spawn_npc(new Door(door));
   }
   for (var y = 0; y < maps[lvl].map.length; y++) {
     for (var x = 0; x < maps[lvl].map[y].length; x++ ) {

@@ -188,7 +188,7 @@ export default {
     cellType(line) {
       if (line.name || line.name === '') return 'dialogue-name'
       else if (line.menu) return 'dialogue-menu'
-      else if (line.move) return 'dialogue-move'
+      else if (line.move || line.move === 0) return 'dialogue-move'
       else if (line.pause || line.pause === 0) return 'dialogue-pause'
     },
     addCell() {

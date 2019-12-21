@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <!--
     <v-row no-gutters class="px-2">
       <v-col cols="3">
         <v-text-field label="Width" type="number" dense hide-details />
@@ -21,6 +22,7 @@
         />
       </v-col>
     </v-row>
+    -->
     <v-row class="px-2">
       <v-col>
         <v-text-field
