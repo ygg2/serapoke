@@ -1,9 +1,12 @@
 <template>
   <v-app id="app">
     <nav-bar
+      :placing.sync="placing"
       :spritedata="spriteData"
       :sprites="sprites"
-      :tileset.sync="tileset"
+      :tileset="tileset"
+      :tilesetData="tilesetData"
+      :blocksize="blocksize"
       :maps="maps"
       :map.sync="selectedMap"
       :npc.sync="selectedNPC"
@@ -12,19 +15,31 @@
       :loading="isLoading"
       :saving="isSaving"
       @save-map="saveStuff"
+      @load-tileset="loadTileset"
+      @select-tile="debuig"
       @change-project-folder="changeProjectFolder"
       @show-error-log="showErrorLog = true"
       @open-npc-editor="currentEditor = 'npc-editor'"
       @create-map="currentEditor = 'new-map-editor'"
       @create-sprite="currentEditor = 'new-sprite-editor'"
     />
-    <v-content app>
+    <v-content style="overflow:scroll" app>
+      <tile-editor
+        v-if="placing"
+        :map="computedMap"
+        :spritedata="spriteData"
+        :blocksize="blocksize"
+        :tileset="tilesetData"
+        :placingtile="placingtile"
+      />
       <room-editor
+        v-if="placing == 2"
         :maps="maps"
         :map="computedMap"
         :spritedata="spriteData"
         :objtype="objtype"
         :npcs="selectedNPCs"
+        :blocksize="blocksize"
         @set-npc="selectedNPC = $event"
         @open-npc-editor="currentEditor = 'npc-editor'"
       />
@@ -64,6 +79,7 @@
 
 <script>
 import NavBar from '@/components/NavBar.vue'
+import TileEditor from '@/components/TileEditor.vue'
 import RoomEditor from '@/components/RoomEditor.vue'
 import NPC from '@/components/NPC.vue'
 import MainControls from '@/components/MainControls.vue'
@@ -77,6 +93,7 @@ const { app, dialog } = require('electron').remote
 export default {
   components: {
     'nav-bar': NavBar,
+    'tile-editor': TileEditor,
     'room-editor': RoomEditor,
     'new-map-editor': NewMapEditor,
     'new-sprite-editor': NewSpriteEditor,
@@ -86,6 +103,8 @@ export default {
   data() {
     return {
       currentEditor: 'no-editor',
+      placing: 2,
+      blocksize: 16,
       sprites: {},
       spriteData: {},
       maps: {
@@ -98,6 +117,8 @@ export default {
       selectedNPC: 0,
       objtype: 0,
       tileset: [],
+      tilesetData: '',
+      placingtile: {},
       projectPath: '',
       error: '',
       errorLog: [],
@@ -134,6 +155,10 @@ export default {
     }
   },
   methods: {
+    debuig(ev) {
+      console.log('event ' + ev)
+      this.placingtile = ev
+    },
     addMap({ name, width, height, background }) {
       this.$set(this.maps, name, {
         map: [],
@@ -156,6 +181,9 @@ export default {
       this.$set(this.sprites, name, image)
       this.$set(this.spriteData, name, this.base64(image))
       this.currentEditor = 'no-editor'
+    },
+    loadTileset(file) {
+      this.tilesetData = this.base64(file, false)
     },
     showNotif(message, error = true) {
       // log an error in the error log
@@ -261,8 +289,13 @@ export default {
       }
       this.isSaving = false
     },
-    base64(spriteFile) {
-      let data = fs.readFileSync(path.join(this.projectPath, spriteFile))
+    base64(spriteFile, relativepath = true) {
+      let data
+      if (relativepath) {
+        data = fs.readFileSync(path.join(this.projectPath, spriteFile))
+      } else {
+        data = fs.readFileSync(spriteFile)
+      }
       let base64Image = Buffer.from(data, 'binary').toString('base64')
       let imgSrcString = `data:image/png;base64,${base64Image}`
       return imgSrcString

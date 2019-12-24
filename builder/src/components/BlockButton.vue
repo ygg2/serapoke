@@ -2,8 +2,10 @@
   <button
     @click="$emit('add-object')"
     @contextmenu="$emit('remove-object')"
+    @mouseover="$emit('mouse-over')"
     :style="blockStyle"
   >
+    <!--should it be mouseenter -->
     <img v-if="image" :src="image" :style="maskStyle" />
   </button>
 </template>

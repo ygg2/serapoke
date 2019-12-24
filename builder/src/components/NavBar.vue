@@ -1,7 +1,12 @@
 <template>
   <v-navigation-drawer permanent app>
     <v-container style="text-align:center">
-      <v-btn-toggle v-model="placing" mandatory dense>
+      <v-btn-toggle
+        :value="placing"
+        @change="$emit('update:placing', $event)"
+        mandatory
+        dense
+      >
         <v-btn>Sprites</v-btn>
         <v-btn>Map</v-btn>
         <v-btn>Objects</v-btn>
@@ -16,8 +21,11 @@
     <tile-controls
       v-show="placing == 1"
       :tileset="tileset"
-      @update:tileset="$emit('update:tileset', $event)"
+      :tilesetData="tilesetData"
+      @load-tileset="$emit('load-tileset', $event)"
+      @select-tile="$emit('select-tile', $event)"
       :map="computedMap"
+      :blocksize="blocksize"
     />
     <object-list
       v-show="placing == 2"
@@ -85,6 +93,10 @@ export default {
     'object-list': ObjectList
   },
   props: {
+    placing: {
+      type: Number,
+      default: 2
+    },
     sprites: {
       type: Object,
       required: true
@@ -96,6 +108,14 @@ export default {
     tileset: {
       type: Array,
       required: true
+    },
+    tilesetData: {
+      type: String,
+      default: ''
+    },
+    blocksize: {
+      type: Number,
+      default: 16
     },
     maps: {
       type: Object,
@@ -124,7 +144,6 @@ export default {
   },
   data() {
     return {
-      placing: 2,
       selectedMap: ''
     }
   },

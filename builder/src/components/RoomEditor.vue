@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <img :src="spritedata[map.background]" class="top-left" />
-    <div class="top-left">
+  <div @mousedown.left="isAdding = true" @mouseup="isAdding = false">
+    <div :style="absoluteSize">
       <div v-for="(row, y) of map.map" :key="'y' + y" :style="displayY">
         <div v-for="(block, x) of row" :key="'x' + x" :style="displayX">
           <block-button
             :block="block"
             @add-object="addObject(x, y)"
+            @mouse-over="addIfDown(x, y)"
             @remove-object="$set(map.map[y], x, 0)"
           />
         </div>
@@ -160,6 +160,7 @@ export default {
       npcY: 0,
       targetDoor: false,
       editingDoor: null,
+      isAdding: false,
       displayX: {
         display: 'inline-block',
         height: '100%',
@@ -172,6 +173,14 @@ export default {
     }
   },
   computed: {
+    absoluteSize() {
+      if (this.map.nomap) return {}
+      return {
+        width: String(this.blocksize * this.map.map[0].length) + 'px',
+        height: String(this.blocksize * this.map.map.length) + 'px',
+        position: 'relative'
+      }
+    },
     nameAndIndex() {
       return [
         ...this.map.doors.map((door, i) => ({ name: door.name, index: i }))
@@ -226,6 +235,11 @@ export default {
             toMap: Object.keys(this.maps)[0]
           })
           this.editingDoor = this.map.doors[this.map.doors.length - 1]
+      }
+    },
+    addIfDown(x, y) {
+      if (this.isAdding && this.objtype == 0) {
+        this.$set(this.map.map[y], x, 1)
       }
     },
     addNPC() {
