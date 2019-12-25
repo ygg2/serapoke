@@ -16,7 +16,7 @@
       :saving="isSaving"
       @save-map="saveStuff"
       @load-tileset="loadTileset"
-      @select-tile="debuig"
+      @select-tile="placingtile = $event"
       @change-project-folder="changeProjectFolder"
       @show-error-log="showErrorLog = true"
       @open-npc-editor="currentEditor = 'npc-editor'"
@@ -27,10 +27,13 @@
       <tile-editor
         v-if="placing"
         :map="computedMap"
+        :mapname="selectedMap"
+        :tempdata="tempTileMaps"
         :spritedata="spriteData"
         :blocksize="blocksize"
         :tileset="tilesetData"
         :placingtile="placingtile"
+        @save-temp-map="saveTempMap"
       />
       <room-editor
         v-if="placing == 2"
@@ -119,6 +122,7 @@ export default {
       tileset: [],
       tilesetData: '',
       placingtile: {},
+      tempTileMaps: {},
       projectPath: '',
       error: '',
       errorLog: [],
@@ -155,9 +159,10 @@ export default {
     }
   },
   methods: {
-    debuig(ev) {
-      console.log('event ' + ev)
-      this.placingtile = ev
+    saveTempMap({ name, image }) {
+      if (name && name in this.maps) {
+        this.tempTileMaps[name] = image
+      }
     },
     addMap({ name, width, height, background }) {
       this.$set(this.maps, name, {
@@ -280,6 +285,30 @@ export default {
           let maptxt = 'var maps = ' + JSON.stringify(this.maps)
           let mapFile = path.join(this.projectPath, 'scripts/room.js')
           await fsprom.writeFile(mapFile, maptxt)
+          // saving tile maps
+          let file, data, buffer
+          for (let key of Object.keys(this.tempTileMaps)) {
+            if (this.maps[key]) {
+              file = path.join(
+                this.projectPath,
+                this.sprites[this.maps[key].background]
+              )
+              data = this.tempTileMaps[key].slice(22)
+              buffer = Buffer.from(data, 'base64')
+              await fsprom.writeFile(file, buffer)
+            }
+          }
+          // also save current tile map
+          if (this.selectedMap) {
+            let canvas = document.getElementById('tileCanvas')
+            file = path.join(
+              this.projectPath,
+              this.sprites[this.computedMap.background]
+            )
+            data = canvas.toDataURL('image/png').slice(22)
+            buffer = Buffer.from(data, 'base64')
+            await fsprom.writeFile(file, buffer)
+          }
         } catch (error) {
           this.showNotif('Could not save the project.')
           this.logError(error)

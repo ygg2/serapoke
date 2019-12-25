@@ -22,6 +22,14 @@ export default {
       type: Object,
       required: true
     },
+    mapname: {
+      type: String,
+      required: true
+    },
+    tempdata: {
+      type: Object,
+      required: true
+    },
     spritedata: {
       type: Object,
       required: true
@@ -41,6 +49,7 @@ export default {
   },
   data() {
     return {
+      lastMap: '',
       canvas: null,
       ctx: null,
       displayX: {
@@ -62,7 +71,11 @@ export default {
     this.loadMap()
   },
   watch: {
-    map() {
+    mapname() {
+      this.$emit('save-temp-map', {
+        name: this.lastMap,
+        image: this.canvas.toDataURL('image/png')
+      })
       this.loadMap()
     },
     tileset() {
@@ -75,8 +88,15 @@ export default {
         this.canvas.width = this.map.map[0].length * this.blocksize
         this.canvas.height = this.map.map.length * this.blocksize
         let background = new Image()
-        background.src = this.spritedata[this.map.background]
-        this.ctx.drawImage(background, 0, 0)
+        background.onload = () => {
+          this.ctx.drawImage(background, 0, 0)
+        }
+        if (this.tempdata[this.mapname]) {
+          background.src = this.tempdata[this.mapname]
+        } else {
+          background.src = this.spritedata[this.map.background]
+        }
+        this.lastMap = this.mapname
       }
     },
     // to do: save
