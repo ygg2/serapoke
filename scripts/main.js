@@ -35,8 +35,8 @@ var room = {
     this.canvas.width = XSIZE;
     this.canvas.height = YSIZE;
     this.ctx = this.canvas.getContext("2d", {alpha: false});
-    this.ctx.imageSmoothingEnabled = false;
-    this.ctx.webkitImageSmoothingEnabled = false;
+    //this.ctx.imageSmoothingEnabled = false;
+    //this.ctx.webkitImageSmoothingEnabled = false;
     // insert the canvas in gameDiv
     document.getElementById("gameDiv").appendChild(room.canvas);
     // add key pressed event
@@ -235,14 +235,19 @@ function Character(x, y, image) {
   this.y = y * GRIDSIZE;
   this.image = spr[image];
   this.visible = true;
-  this.mask = { x: 8, y: 16, width: GRIDSIZE, height: GRIDSIZE };
+  this.mask = {
+    x: 0,
+    y: this.image ? this.image.height - GRIDSIZE : 0,
+    width: GRIDSIZE,
+    height: GRIDSIZE
+  };
   this.hsp = 0;
   this.vsp = 0;
   this.dirx = 0;
   this.diry = 0;
   this.img_speed = 0;
-  this.max_speed = 1;
-  this.max_run_speed = 2;
+  this.max_speed = 4;
+  this.max_run_speed = 8;
   this.input = {r: 0, l: 0, u: 0, d: 0, run: 0};
 }
 Character.prototype = {
@@ -358,12 +363,7 @@ function Npc({labels, name, image, x, y, spawn_condition, mask}) {
   this.spawn_condition = spawn_condition || false;
   this.x = x || 0;
   this.y = y || 0;
-  this.mask = mask || {
-    x: 0,
-    y: 0,
-    width: GRIDSIZE,
-    height: GRIDSIZE
-  };
+  if (mask) this.mask = mask
   this.draw = function() {
     if (this.image) {
       room.ctx.drawImage(this.image, this.x-this.mask.x, this.y-this.mask.y);
@@ -630,6 +630,7 @@ function create_level(lvl) {
   room.map = maps[lvl].map;
   blocks = [];
   nonnpcs = [];
+  npcs = [];
   map_w = GRIDSIZE * maps[lvl].map[0].length;
   map_h = GRIDSIZE * maps[lvl].map.length;
   if (map_w < XSIZE) map_w = XSIZE;

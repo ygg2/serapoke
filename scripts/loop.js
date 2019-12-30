@@ -37,16 +37,19 @@ var update = function() {
       }
     }
   }
-  drawx = clamp(player.x+player.mask.width/2-XSIZE/4, 0, map_w-XSIZE/2);
-  drawy = clamp(player.y+player.mask.height/2-YSIZE/4, 0, map_h-YSIZE/2);
+  //drawx = clamp(player.x+player.mask.width/2-XSIZE/4, 0, map_w-XSIZE/2);
+  //drawy = clamp(player.y+player.mask.height/2-YSIZE/4, 0, map_h-YSIZE/2);
+  drawx = clamp(player.x+player.mask.width/2-XSIZE/2, 0, map_w-XSIZE/2);
+  drawy = clamp(player.y+player.mask.height/2-YSIZE/2, 0, map_h-YSIZE/2);
 }
 
 // MAIN DRAW EVENT
 var render = function() {
   room.clear();
   room.ctx.save();
-  room.ctx.translate(-drawx*2,-drawy*2);
-  room.ctx.scale(2,2)
+  //room.ctx.translate(-drawx*2,-drawy*2);
+  room.ctx.translate(-drawx, -drawy)
+  //room.ctx.scale(2,2)
   room_background.draw();
 //  for (let block of blocks) { block.draw(); }
   for (let npc of npcs) npc.draw()

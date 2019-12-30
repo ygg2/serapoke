@@ -38,21 +38,8 @@ for (let key of Object.keys(maps)) {
   )
 }
 
-
-
-items = {
-  journal: {
-    name: "Journal",
-    description: "I'll use this to record what happens."
-  },
-  mask: {
-    name: "Mask",
-    description: "The mask Lora made for me. Don't forget her."
-  }
-}
-
 // player
-player = new Player(0, 0, "jin_nomask");
+player = new Player(0, 0, "yuu");
 
 // INTRO
 label.main_menu = [
@@ -81,9 +68,9 @@ label.serapoke_init = [
 ()=>{
   player.visible = true;
   bt.adv.box.visible = true;
-  inventory.mask = items.mask;
+  inventory.boots = items.boots;
 },
-{room:"Jin_Island"}
+{room:"Snow Cave"}
 ]
 
 label.serapoke_load = [

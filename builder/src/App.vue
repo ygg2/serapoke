@@ -21,11 +21,10 @@
       @show-error-log="showErrorLog = true"
       @open-npc-editor="currentEditor = 'npc-editor'"
       @create-map="currentEditor = 'new-map-editor'"
-      @create-sprite="currentEditor = 'new-sprite-editor'"
     />
     <v-content style="overflow:scroll" app>
       <tile-editor
-        v-if="placing"
+        :placing="placing"
         :map="computedMap"
         :mapname="selectedMap"
         :tempdata="tempTileMaps"
@@ -36,7 +35,9 @@
         @save-temp-map="saveTempMap"
       />
       <room-editor
+        class="top-left"
         v-if="placing == 2"
+        :active="roomEditorActive"
         :maps="maps"
         :map="computedMap"
         :spritedata="spriteData"
@@ -51,10 +52,13 @@
         :selected.sync="selected"
         :sprites="sprites"
         :spritedata="spriteData"
+        :items="items"
         :npcs="selectedNPCs"
         :map="computedMap"
         :objtype="objtype"
         @open-room-editor="currentEditor = 'no-editor'"
+        @open-sprite-editor="currentEditor = 'sprite-editor'"
+        @open-item-editor="currentEditor = 'item-editor'"
         @add-map="addMap"
         @add-sprite="addSprite"
       />
@@ -84,10 +88,11 @@
 import NavBar from '@/components/NavBar.vue'
 import TileEditor from '@/components/TileEditor.vue'
 import RoomEditor from '@/components/RoomEditor.vue'
+import SpriteEditor from '@/components/SpriteEditor.vue'
+import ItemEditor from '@/components/ItemEditor.vue'
 import NPC from '@/components/NPC.vue'
 import MainControls from '@/components/MainControls.vue'
 import NewMapEditor from '@/components/NewMapEditor.vue'
-import NewSpriteEditor from '@/components/NewSpriteEditor.vue'
 var fs = require('fs')
 const fsprom = fs.promises
 var path = require('path')
@@ -98,8 +103,9 @@ export default {
     'nav-bar': NavBar,
     'tile-editor': TileEditor,
     'room-editor': RoomEditor,
+    'sprite-editor': SpriteEditor,
+    'item-editor': ItemEditor,
     'new-map-editor': NewMapEditor,
-    'new-sprite-editor': NewSpriteEditor,
     'npc-editor': NPC,
     'no-editor': MainControls
   },
@@ -107,9 +113,10 @@ export default {
     return {
       currentEditor: 'no-editor',
       placing: 2,
-      blocksize: 16,
+      blocksize: 64,
       sprites: {},
       spriteData: {},
+      items: {},
       maps: {
         defaultmap: {
           map: [[]],
@@ -135,6 +142,9 @@ export default {
     }
   },
   computed: {
+    roomEditorActive() {
+      return this.currentEditor == 'no-editor'
+    },
     selected() {
       // return object containing NOMAP or NONPC flags
       if (!this.selectedMap) return { nomap: true, nonpcs: true }
@@ -182,10 +192,12 @@ export default {
         this.selectedMap = name
       })
     },
-    addSprite({ name, image }) {
+    addSprite({ name, image, prev }) {
+      if (prev != '') {
+        this.$delete(this.sprites, prev)
+      }
       this.$set(this.sprites, name, image)
       this.$set(this.spriteData, name, this.base64(image))
-      this.currentEditor = 'no-editor'
     },
     loadTileset(file) {
       this.tilesetData = this.base64(file, false)
@@ -229,6 +241,7 @@ export default {
     async loadStuff() {
       let success = true
       this.isLoading = true
+
       // load sprites
       let spriteFile = path.join(this.projectPath, 'scripts/sprite.js')
       try {
@@ -250,6 +263,21 @@ export default {
         let value = this.sprites[key]
         this.spriteData[key] = this.base64(value)
       }
+      // load items
+      let itemFile = path.join(this.projectPath, 'scripts/item.js')
+      try {
+        let items = await fsprom.readFile(itemFile, { encoding: 'utf8' })
+        this.items = JSON.parse(items.slice(12))
+      } catch (err) {
+        if (err instanceof SyntaxError) {
+          this.showNotif('Error parsing item file.')
+        } else {
+          this.showNotif('Error reading item file.')
+        }
+        this.logError(err)
+        success = false
+      }
+
       // load maps
       let mapFile = path.join(this.projectPath, 'scripts/room.js')
       try {
@@ -281,6 +309,10 @@ export default {
           let spritetxt = 'var SPRITES = ' + JSON.stringify(this.sprites)
           let spriteFile = path.join(this.projectPath, 'scripts/sprite.js')
           await fsprom.writeFile(spriteFile, spritetxt)
+          // saving items
+          let itemtxt = 'var items = ' + JSON.stringify(this.items)
+          let itemFile = path.join(this.projectPath, 'scripts/item.js')
+          await fsprom.writeFile(itemFile, itemtxt)
           // saving maps
           let maptxt = 'var maps = ' + JSON.stringify(this.maps)
           let mapFile = path.join(this.projectPath, 'scripts/room.js')
@@ -310,7 +342,7 @@ export default {
             await fsprom.writeFile(file, buffer)
           }
         } catch (error) {
-          this.showNotif('Could not save the project.')
+          this.showNotif('Error during project save.')
           this.logError(error)
         }
       } else {
@@ -334,6 +366,9 @@ export default {
 </script>
 
 <style>
+html {
+  overflow-y: hidden !important;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -358,5 +393,11 @@ a {
   position: absolute;
   left: 0;
   top: 0;
+}
+.center-card {
+  position: fixed;
+  top: 0;
+  width: 60%;
+  max-height: 92vh;
 }
 </style>

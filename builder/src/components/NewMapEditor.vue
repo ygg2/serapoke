@@ -7,7 +7,6 @@
         <v-text-field label="Name" v-model="name" :error-messages="nameError" />
         <number-input label="Width" v-model="width" :error="widthError" />
         <number-input label="Height" v-model="height" :error="heightError" />
-        <v-text-field label="Background" v-model="background" />
         <v-row justify="end" class="pr-4">
           <v-btn @click="createMap">Create</v-btn>
         </v-row>
@@ -27,7 +26,6 @@ export default {
       name: '',
       width: '10',
       height: '10',
-      background: '',
       nameError: '',
       widthError: '',
       heightError: ''
@@ -50,7 +48,7 @@ export default {
           name: this.name,
           width: parsedWidth,
           height: parsedHeight,
-          background: this.background
+          background: 'map_' + this.name
         })
       }
     }

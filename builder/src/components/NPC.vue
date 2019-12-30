@@ -1,7 +1,7 @@
 <template>
   <v-row align="center" justify="center">
     <div class="full-cover" @click="$emit('open-room-editor')" />
-    <v-card raised style="width:80%;" class="mt-4">
+    <v-card raised class="center-card mt-4">
       <v-row v-if="selected.nonpcs" no-gutters>
         <v-card-text>This map has no npcs.</v-card-text>
       </v-row>
@@ -24,25 +24,25 @@
               hide-details
             />
             <v-img
-              v-if="selected.image"
               :src="spritePath"
               aspect-ratio="1"
               class="crisp my-5"
-              max-height="25vh"
-              max-width="25vh"
+              style="margin-left:20%"
+              max-height="20vh"
+              max-width="20vh"
             >
               <template v-slot:placeholder>
-                <v-row align="center" justify="center">
+                <v-row v-if="selected.image" align="center" justify="center">
                   <v-progress-circular indeterminate />
                 </v-row>
+                <v-chip v-else class="my-5">No sprite chosen.</v-chip>
               </template>
             </v-img>
-            <v-chip v-else class="my-5">No sprite chosen.</v-chip>
             <v-text-field
               label="Spawn Condition"
               v-model="selected.spawn_condition"
             />
-            <v-list>
+            <v-list style="max-height:245px;overflow-y:scroll">
               <v-subheader style="position:relative">
                 Scripts
                 <v-btn absolute right icon small @click="addScript()">

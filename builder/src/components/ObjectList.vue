@@ -1,5 +1,5 @@
 <template>
-  <v-card flat max-height="500" style="overflow:scroll">
+  <v-card flat max-height="500">
     <v-radio-group
       v-model="objtype"
       @change="$emit('update:object-type', $event)"
@@ -13,7 +13,7 @@
       <v-radio label="Door" />
     </v-radio-group>
     <v-subheader>Objects</v-subheader>
-    <v-list dense>
+    <v-list dense style="overflow-y:scroll">
       <v-list-item v-if="map.nomap">No map selected.</v-list-item>
       <v-list-item v-else-if="map.nonpcs">This map has no npcs.</v-list-item>
       <v-list-item-group v-else>

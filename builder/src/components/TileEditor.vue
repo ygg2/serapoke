@@ -4,7 +4,12 @@
     <div class="top-left">
       <div v-for="(row, y) of map.map" :key="'y' + y" :style="displayY">
         <div v-for="(block, x) of row" :key="'x' + x" :style="displayX">
-          <block-button @add-object="addTile(x, y)" />
+          <block-button
+            @add-object="addTile(x, y)"
+            :coords="placing == 1"
+            :x="x"
+            :y="y"
+          />
         </div>
       </div>
     </div>
@@ -18,6 +23,10 @@ export default {
     'block-button': BlockButton
   },
   props: {
+    placing: {
+      type: Number,
+      default: 0
+    },
     map: {
       type: Object,
       required: true
@@ -49,6 +58,7 @@ export default {
   },
   data() {
     return {
+      hasBeenModified: false,
       lastMap: '',
       canvas: null,
       ctx: null,
@@ -72,10 +82,12 @@ export default {
   },
   watch: {
     mapname() {
-      this.$emit('save-temp-map', {
-        name: this.lastMap,
-        image: this.canvas.toDataURL('image/png')
-      })
+      if (this.hasBeenModified) {
+        this.$emit('save-temp-map', {
+          name: this.lastMap,
+          image: this.canvas.toDataURL('image/png')
+        })
+      }
       this.loadMap()
     },
     tileset() {
@@ -97,22 +109,30 @@ export default {
           background.src = this.spritedata[this.map.background]
         }
         this.lastMap = this.mapname
+      } else {
+        this.canvas.width = 0
+        this.canvas.height = 0
       }
+      this.hasBeenModified = false
     },
     // to do: save
     addTile(x, y) {
-      if (this.placingtile.dx || this.placingtile.dx === 0)
-        this.ctx.drawImage(
-          this.tiles,
-          this.placingtile.sx * this.blocksize,
-          this.placingtile.sy * this.blocksize,
-          this.blocksize,
-          this.blocksize,
-          x * this.blocksize,
-          y * this.blocksize,
-          this.blocksize,
-          this.blocksize
-        )
+      if (this.placing == 0) {
+        if (this.placingtile.dx || this.placingtile.dx === 0) {
+          this.ctx.drawImage(
+            this.tiles,
+            this.placingtile.sx * this.blocksize,
+            this.placingtile.sy * this.blocksize,
+            this.blocksize,
+            this.blocksize,
+            x * this.blocksize,
+            y * this.blocksize,
+            this.blocksize,
+            this.blocksize
+          )
+        }
+        this.hasBeenModified = true
+      }
     }
   }
 }

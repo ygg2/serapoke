@@ -7,19 +7,13 @@
         mandatory
         dense
       >
-        <v-btn>Sprites</v-btn>
+        <v-btn>Tiles</v-btn>
         <v-btn>Map</v-btn>
         <v-btn>Objects</v-btn>
       </v-btn-toggle>
     </v-container>
-    <sprite-controls
-      v-show="placing == 0"
-      :sprites="sprites"
-      :spritedata="spritedata"
-      @create-sprite="$emit('create-sprite')"
-    />
     <tile-controls
-      v-show="placing == 1"
+      v-show="placing == 0"
       :tileset="tileset"
       :tilesetData="tilesetData"
       @load-tileset="$emit('load-tileset', $event)"
@@ -27,6 +21,7 @@
       :map="computedMap"
       :blocksize="blocksize"
     />
+    <map-controls v-show="placing == 1" :map="computedMap" />
     <object-list
       v-show="placing == 2"
       :map="computedMap"
@@ -83,27 +78,19 @@
 </template>
 
 <script>
-import SpriteControls from '@/components/SpriteControls.vue'
 import TileControls from '@/components/TileControls.vue'
+import MapControls from '@/components/MapControls.vue'
 import ObjectList from '@/components/ObjectList.vue'
 export default {
   components: {
-    'sprite-controls': SpriteControls,
     'tile-controls': TileControls,
+    'map-controls': MapControls,
     'object-list': ObjectList
   },
   props: {
     placing: {
       type: Number,
       default: 2
-    },
-    sprites: {
-      type: Object,
-      required: true
-    },
-    spritedata: {
-      type: Object,
-      required: true
     },
     tileset: {
       type: Array,

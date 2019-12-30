@@ -1,14 +1,6 @@
 <template>
   <v-container>
     <v-row no-gutters class="px-2">
-      <!--
-      <v-col cols="3">
-        <v-text-field label="Width" type="number" dense hide-details />
-      </v-col>
-      <v-col cols="3" class="px-2">
-        <v-text-field label="Height" type="number" dense hide-details />
-      </v-col>
-      -->
       <v-col>
         <v-file-input
           label="Tileset"
@@ -22,28 +14,7 @@
         />
       </v-col>
     </v-row>
-    <v-row class="px-2" no-gutters>
-      <v-col>
-        <v-text-field
-          label="Background"
-          v-model="map.background"
-          dense
-          hide-details
-        />
-      </v-col>
-    </v-row>
-    <v-row class="pr-2" no-gutters>
-      <v-col>
-        <v-subheader>Player Spawn</v-subheader>
-      </v-col>
-      <v-col class="pr-1">
-        <number-input label="X" v-model="map.spawnx" />
-      </v-col>
-      <v-col class="pl-1">
-        <number-input label="Y" v-model="map.spawny" />
-      </v-col>
-    </v-row>
-    <v-row style="height:320px; overflow-y:scroll; position:relative">
+    <v-row style="height:370px; overflow-y:scroll; position:relative">
       <canvas id="tilePicker" style="background-color:black" width="256" />
       <div class="top-left" style="line-height: 0">
         <div v-for="(cell, i) of tilePicker" :key="i" :style="cellStyle">
@@ -56,17 +27,11 @@
 
 <script>
 import BlockButton from '@/components/BlockButton.vue'
-import NumberInput from '@/components/NumberInput.vue'
 export default {
   components: {
-    'block-button': BlockButton,
-    'number-input': NumberInput
+    'block-button': BlockButton
   },
   props: {
-    map: {
-      type: Object,
-      required: true
-    },
     tileset: {
       type: Array,
       required: true
@@ -127,6 +92,9 @@ export default {
             }
           }
         }
+
+        // select first tile in set
+        this.$emit('select-tile', this.tilePicker[0])
       }
       tiles.src = this.tilesetData
     }
@@ -154,3 +122,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+::-webkit-scrollbar {
+  width: 0px;
+  background:transparent;
+}

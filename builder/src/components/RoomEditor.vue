@@ -7,7 +7,7 @@
             :block="block"
             @add-object="addObject(x, y)"
             @mouse-over="addIfDown(x, y)"
-            @remove-object="$set(map.map[y], x, 0)"
+            @remove-object="removeBlock(x, y)"
           />
         </div>
       </div>
@@ -33,7 +33,7 @@
     />
     <v-row v-if="editingDoor !== null" align="center" justify="center">
       <div class="full-cover" @click="editingDoor = null" />
-      <v-card raised style="width:80%;" class="mt-4">
+      <v-card raised class="center-card mt-4">
         <v-card-title>Edit Door</v-card-title>
         <v-card-text>
           <v-select
@@ -57,7 +57,7 @@
     </v-row>
     <v-row v-show="creatingNPC" align="center" justify="center">
       <div class="full-cover" @click="creatingNPC = false" />
-      <v-card raised style="width:80%;" class="mt-4">
+      <v-card raised class="center-card mt-4">
         <v-card-title>
           New NPC
           <v-btn @click="creatingNPC = false" absolute right icon>
@@ -90,7 +90,7 @@
     </v-row>
     <v-row v-show="deletePrompt && !targetDoor" align="center" justify="center">
       <div class="full-cover" @click="deletePrompt = false" />
-      <v-card raised style="width:80%;" class="mt-4">
+      <v-card raised class="center-card mt-4">
         <v-card-title>Permanently delete {{ npcToRemove }}?</v-card-title>
         <v-card-text>
           <delete-menu v-model="deletePrompt" @remove="removeNPC" />
@@ -99,7 +99,7 @@
     </v-row>
     <v-row v-show="deletePrompt && targetDoor" align="center" justify="center">
       <div class="full-cover" @click="deletePrompt = false" />
-      <v-card raised style="width:80%;" class="mt-4">
+      <v-card raised class="center-card mt-4">
         <v-card-title>Permanently delete door?</v-card-title>
         <v-card-text>
           <delete-menu v-model="deletePrompt" @remove="removeDoor" />
@@ -122,6 +122,10 @@ export default {
     'delete-menu': DeleteMenu
   },
   props: {
+    active: {
+      type: Boolean,
+      default: false
+    },
     maps: {
       type: Object,
       required: true
@@ -192,17 +196,31 @@ export default {
       return ''
     }
   },
+  watch: {
+    active() {
+      this.isAdding = false
+    }
+  },
   methods: {
     promptRemoveNPC(name, index) {
-      this.npcToRemove = name
-      this.indexToRemove = index
-      this.targetDoor = false
-      this.deletePrompt = true
+      if (this.active) {
+        this.npcToRemove = name
+        this.indexToRemove = index
+        this.targetDoor = false
+        this.deletePrompt = true
+      }
     },
     promptRemoveDoor(index) {
-      this.indexToRemove = index
-      this.targetDoor = true
-      this.deletePrompt = true
+      if (this.active) {
+        this.indexToRemove = index
+        this.targetDoor = true
+        this.deletePrompt = true
+      }
+    },
+    removeBlock(x, y) {
+      if (this.active) {
+        this.$set(this.map.map[y], x, 0)
+      }
     },
     removeNPC() {
       if (this.indexToRemove != -1) this.npcs.splice(this.indexToRemove, 1)
@@ -211,48 +229,54 @@ export default {
       if (this.indexToRemove != -1) this.map.doors.splice(this.indexToRemove, 1)
     },
     addObject(x, y) {
-      // types: 0 - block, 1 - npc, 2 - door
-      switch (this.objtype) {
-        case 0:
-          if (this.map.map[y][x]) this.$set(this.map.map[y], x, 0)
-          else this.$set(this.map.map[y], x, 1)
-          break
-        case 1:
-          this.npcX = x
-          this.npcY = y
-          this.npcName = ''
-          this.creatingNPC = true
-          this.$nextTick(() => {
-            document.getElementById('npcCard').focus()
-          })
-          break
-        case 2:
-          this.map.doors.push({
-            x: x,
-            y: y,
-            toX: 0,
-            toY: 0,
-            toMap: Object.keys(this.maps)[0]
-          })
-          this.editingDoor = this.map.doors[this.map.doors.length - 1]
+      if (this.active) {
+        // types: 0 - block, 1 - npc, 2 - door
+        switch (this.objtype) {
+          case 0:
+            if (this.map.map[y][x]) this.$set(this.map.map[y], x, 0)
+            else this.$set(this.map.map[y], x, 1)
+            break
+          case 1:
+            this.npcX = x
+            this.npcY = y
+            this.npcName = ''
+            this.creatingNPC = true
+            this.$nextTick(() => {
+              document.getElementById('npcCard').focus()
+            })
+            break
+          case 2:
+            this.map.doors.push({
+              x: x,
+              y: y,
+              toX: 0,
+              toY: 0,
+              toMap: Object.keys(this.maps)[0]
+            })
+            this.editingDoor = this.map.doors[this.map.doors.length - 1]
+        }
       }
     },
     addIfDown(x, y) {
-      if (this.isAdding && this.objtype == 0) {
-        this.$set(this.map.map[y], x, 1)
+      if (this.active) {
+        if (this.isAdding && this.objtype == 0) {
+          this.$set(this.map.map[y], x, 1)
+        }
       }
     },
     addNPC() {
-      if (this.npcName && !this.nameError) {
-        this.creatingNPC = false
-        this.npcs.push({
-          name: this.npcName,
-          x: this.npcX,
-          y: this.npcY,
-          labels: { Main: [] }
-        })
-        this.$emit('set-npc', this.npcs.length - 1)
-        this.$emit('open-npc-editor')
+      if (this.active) {
+        if (this.npcName && !this.nameError) {
+          this.creatingNPC = false
+          this.npcs.push({
+            name: this.npcName,
+            x: this.npcX,
+            y: this.npcY,
+            labels: { Main: [] }
+          })
+          this.$emit('set-npc', this.npcs.length - 1)
+          this.$emit('open-npc-editor')
+        }
       }
     },
     moveNPC() {
@@ -270,11 +294,15 @@ export default {
       }
     },
     viewNPC(index) {
-      this.$emit('set-npc', index)
-      this.$emit('open-npc-editor')
+      if (this.active) {
+        this.$emit('set-npc', index)
+        this.$emit('open-npc-editor')
+      }
     },
     viewDoor(index) {
-      this.editingDoor = this.map.doors[index]
+      if (this.active) {
+        this.editingDoor = this.map.doors[index]
+      }
     }
   }
 }

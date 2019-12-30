@@ -1,0 +1,1 @@
+var items = {"journal":{"name":"Journal","description":"I'll use this to record what happens."},"mask":{"name":"Mask","description":"The mask Lora made for me. Don't forget her."},"boots":{"name":"Thigh-high hover boots","description":"They help you nyoom"}}

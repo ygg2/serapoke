@@ -1,18 +1,30 @@
 <template>
   <button
-    @click="$emit('add-object')"
-    @contextmenu="$emit('remove-object')"
+    @mousedown="addOrRemove"
     @mouseover="$emit('mouse-over')"
     :style="blockStyle"
+    :class="{ coords }"
   >
-    <!--should it be mouseenter -->
     <img v-if="image" :src="image" :style="maskStyle" />
+    <p v-if="coords">{{ x }}, {{ y }}</p>
   </button>
 </template>
 
 <script>
 export default {
   props: {
+    coords: {
+      type: Boolean,
+      default: false
+    },
+    x: {
+      type: Number,
+      default: 0
+    },
+    y: {
+      type: Number,
+      default: 0
+    },
     block: {
       type: Number,
       default: 0
@@ -38,8 +50,14 @@ export default {
       return {
         position: 'absolute',
         left: '0',
-        top: '0'
+        bottom: '0'
       }
+    }
+  },
+  methods: {
+    addOrRemove(ev) {
+      if (ev.button == 0) this.$emit('add-object')
+      else if (ev.button == 2) this.$emit('remove-object')
     }
   }
 }
@@ -57,5 +75,13 @@ button {
 button:hover {
   background: #8822ff55;
   outline: 1px solid #8822ff;
+}
+button p {
+  opacity: 0;
+  color: white;
+  text-shadow: 0 0 3px black;
+}
+button.coords:hover p {
+  opacity: 1;
 }
 </style>

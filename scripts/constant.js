@@ -2,18 +2,18 @@
 /* things that probably shouldn't change after game start*/
 
 // title
-var TITLE = "Jin Helps People";
+var TITLE = "Serapoke";
 
 // screen size
 var XSIZE = 680;
 var YSIZE = 520;
 
 // block size
-var GRIDSIZE = 16;
+var GRIDSIZE = 64;
 
 // box preferences
-var BOX_X = 8;
-var BOX_Y = 450;
+var BOX_X = 10;
+var BOX_Y = 356;
 var BOX_IMAGE ="";
 
 // text preferences
@@ -34,12 +34,12 @@ var CHAR_OFFSET_V = 2;
 var CHAR_OFFSET_H = 0;
 
 // standard menu preferences
-var MENU_X = 500;
-var MENU_Y = 400;
+var MENU_X = 450;
+var MENU_Y = 370;
 var MENU_SPACING = 50;
 var MENU_INDICATOR = "menu_indicator";
 //var MENU_INDICATOR;
-var MENU_INDICATOR_OFFSET = -16;
+var MENU_INDICATOR_OFFSET = -24;
 
 // extra preferences
 var BUTTON_HEIGHT = 40;
