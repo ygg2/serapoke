@@ -36,7 +36,7 @@ export default {
   computed: {
     npcPos() {
       let left = this.blocksize * this.npc.x || 0
-      let top = (this.blocksize * this.npc.y || 0) + 1 // figure out why later
+      let top = this.blocksize * this.npc.y || 0
       let pos = {
         position: 'absolute',
         left: left.toString() + 'px',

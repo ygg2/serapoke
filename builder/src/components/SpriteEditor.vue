@@ -106,21 +106,23 @@ export default {
       // validate
       if (this.editingSprite.name == '') this.nameError = 'Must have a name'
       if (!this.editingSprite.image) this.imageError = 'Please choose an image'
-      for (let spr of Object.keys(this.sprites)) {
-        if (this.editingSprite.name == spr) {
-          this.nameError = 'Another sprite already has this name'
+      if (this.editingSprite.prev != this.editingSprite.name) {
+        for (let spr of Object.keys(this.sprites)) {
+          if (this.editingSprite.name == spr) {
+            this.nameError = 'Another sprite already has this name'
+          }
         }
       }
       // send sprite to be added
       if (!this.nameError && !this.imageError) {
         this.$emit('add-sprite', this.editingSprite)
+        // close update panel
+        this.spriteEditorOpen = false
       }
       // update sprites
       this.reset()
       if (this.sorting == 'Alphabetical') this.sort()
       else if (this.sorting == 'Type') this.sortType()
-      // close update panel
-      this.spriteEditorOpen = false
     }
   }
 }

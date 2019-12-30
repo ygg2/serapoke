@@ -376,7 +376,7 @@ html {
   color: #2c3e50;
 }
 .full-cover {
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   width: 100%;

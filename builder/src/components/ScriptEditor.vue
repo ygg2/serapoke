@@ -80,6 +80,7 @@
           :labels="labels"
           :npcs="npcs"
           :index="name + i"
+          :items="items"
           @create-next="createNext(name, i)"
           @remove-action="removeCell(name, i)"
           @focus-next="focusNext(name, i)"
@@ -116,12 +117,14 @@ save (no parameters. pass true.)
 import DialogueName from '@/components/DialogueName.vue'
 import DialogueMenu from '@/components/DialogueMenu.vue'
 import DialogueMove from '@/components/DialogueMove.vue'
+import DialogueItem from '@/components/DialogueItem.vue'
 import DialoguePause from '@/components/DialoguePause.vue'
 export default {
   components: {
     'dialogue-name': DialogueName,
     'dialogue-menu': DialogueMenu,
     'dialogue-move': DialogueMove,
+    'dialogue-item': DialogueItem,
     'dialogue-pause': DialoguePause
   },
   props: {
@@ -144,6 +147,10 @@ export default {
     npcs: {
       type: Array,
       required: true
+    },
+    items: {
+      type: Object,
+      required: true
     }
   },
   data() {
@@ -161,6 +168,11 @@ export default {
         ['Shift + Up', 'Add cell above']
       ],
       cellTypeList: [
+        {
+          color: 'orange',
+          cellType: 'item',
+          icon: 'mdi-pencil'
+        },
         {
           color: 'red',
           cellType: 'pause',
@@ -190,6 +202,7 @@ export default {
       else if (line.menu) return 'dialogue-menu'
       else if (line.move || line.move === 0) return 'dialogue-move'
       else if (line.pause || line.pause === 0) return 'dialogue-pause'
+      else if (line.pickup || line.drop) return 'dialogue-item'
     },
     addCell() {
       this.story.push('')
@@ -248,6 +261,9 @@ export default {
           break
         case 'pause':
           this.story.splice(index, 1, { pause: 60 })
+          break
+        case 'item':
+          this.story.splice(index, 1, { pickup: Object.keys(this.items)[0] })
           break
       }
     }

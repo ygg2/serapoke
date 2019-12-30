@@ -77,6 +77,7 @@
             :label="editLabel"
             :labels="Object.keys(selected.labels)"
             :npcs="npcs"
+            :items="items"
             @update-name="updateScriptName"
           />
         </v-col>
@@ -104,6 +105,10 @@ export default {
     },
     npcs: {
       type: Array,
+      required: true
+    },
+    items: {
+      type: Object,
       required: true
     }
   },

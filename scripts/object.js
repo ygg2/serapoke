@@ -39,7 +39,7 @@ for (let key of Object.keys(maps)) {
 }
 
 // player
-player = new Player(0, 0, "yuu");
+player = new Player(0, 0, "mika");
 
 // INTRO
 label.main_menu = [

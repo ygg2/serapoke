@@ -1,7 +1,7 @@
 <template>
   <v-row align="center" justify="center">
     <div class="full-cover" @click="$emit('open-room-editor')" />
-    <v-card raised style="width:80%;" class="mt-4">
+    <v-card raised class="center-card mt-4">
       <v-card-title>New Map</v-card-title>
       <v-card-text>
         <v-text-field label="Name" v-model="name" :error-messages="nameError" />

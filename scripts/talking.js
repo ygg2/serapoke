@@ -130,8 +130,8 @@ bt.Jump = function(newLabel) {
   bt.Next();
 }
 bt.Insert = function() {
-  for (i=0;i<arguments.length;++i) {
-    story.splice(bt.line+1+i,0,arguments[i]);
+  for (var i=0;i<arguments.length;++i) {
+    story.splice(bt.line+i,0,arguments[i]);
   }
 }
 bt.Menu = function() {
