@@ -243,10 +243,11 @@ export default {
         this.error = 'Warning: you must choose a folder.'
       }
     },
-    async loadFile(fileName, sliceAmount, obj, storeVar) {
+    async loadFile(fileName, sliceAmount, storeVar) {
       try {
         let file = path.join(this.projectPath, fileName)
-        obj[storeVar] = JSON.parse(file.slice(sliceAmount))
+        let data = await fsprom.readFile(file, { encoding: 'utf8' })
+        this[storeVar] = JSON.parse(data.slice(sliceAmount))
       } catch (err) {
         if (err instanceof SyntaxError) {
           this.showNotif('Error parsing ' + storeVar + ' file.')
@@ -263,73 +264,21 @@ export default {
       this.isLoading = true
 
       // load sprites
-      let spriteFile = path.join(this.projectPath, 'scripts/sprite.js')
-      try {
-        let spr = await fsprom.readFile(spriteFile, { encoding: 'utf8' })
-        this.sprites = JSON.parse(spr.slice(14))
-      } catch (err) {
-        if (err instanceof SyntaxError) {
-          this.showNotif('Error parsing sprite file.')
-        } else {
-          this.showNotif('Error reading sprite file.')
-        }
-        this.logError(err)
-        success = false
-      }
+      success = await this.loadFile('scripts/sprite.js', 14, 'sprites')
       // convert sprites to base64 strings
-      let spriteStrings = Object.keys(this.sprites)
-      for (var i = 0; i < spriteStrings.length; i++) {
-        let key = spriteStrings[i]
+      for (let key of Object.keys(this.sprites)) {
         let value = this.sprites[key]
         this.spriteData[key] = this.base64(value)
       }
 
       // load items
-      let itemFile = path.join(this.projectPath, 'scripts/item.js')
-      try {
-        let items = await fsprom.readFile(itemFile, { encoding: 'utf8' })
-        this.items = JSON.parse(items.slice(12))
-      } catch (err) {
-        if (err instanceof SyntaxError) {
-          this.showNotif('Error parsing item file.')
-        } else {
-          this.showNotif('Error reading item file.')
-        }
-        this.logError(err)
-        success = false
-      }
-
+      success = await this.loadFile('scripts/item.js', 12, 'items')
       // load enemies
-      let enemyFile = path.join(this.projectPath, 'scripts/enemy.js')
-      try {
-        let enemies = await fsprom.readFile(enemyFile, { encoding: 'utf8' })
-        this.enemies = JSON.parse(enemies.slice(13))
-      } catch (err) {
-        if (err instanceof SyntaxError) {
-          this.showNotif('Error parsing enemy file')
-        } else {
-          this.showNotif('Error reading enemy file')
-        }
-        this.logError(err)
-        success = false
-      }
-
+      success = await this.loadFile('scripts/enemy.js', 13, 'enemies')
       // load maps
-      let mapFile = path.join(this.projectPath, 'scripts/room.js')
-      try {
-        let map = await fsprom.readFile(mapFile, { encoding: 'utf8' })
-        this.maps = JSON.parse(map.slice(11))
-        // unselect any map
-        this.selectedMap = ''
-      } catch (err) {
-        if (err instanceof SyntaxError) {
-          this.showNotif('Error parsing map file.')
-        } else {
-          this.showNotif('Error reading map file.')
-        }
-        this.logError(err)
-        success = false
-      }
+      this.selectedMap = ''
+      success = await this.loadFile('scripts/room.js', 11, 'maps')
+
       // once everything has loaded
       this.isLoading = false
       if (success) {
