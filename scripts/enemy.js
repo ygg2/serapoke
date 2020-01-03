@@ -1,0 +1,1 @@
+var enemies = {"Owlbear":{"name":"Owlbear","image":"owlbear","hp":59,"speed":40,"atk":20,"def":13},"Tarrasque":{"name":"Tarrasque","image":"tarrasque","hp":676,"speed":40,"atk":30,"def":25}}

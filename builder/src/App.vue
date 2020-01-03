@@ -53,12 +53,14 @@
         :sprites="sprites"
         :spritedata="spriteData"
         :items="items"
+        :enemies="enemies"
         :npcs="selectedNPCs"
         :map="computedMap"
         :objtype="objtype"
         @open-room-editor="currentEditor = 'no-editor'"
         @open-sprite-editor="currentEditor = 'sprite-editor'"
         @open-item-editor="currentEditor = 'item-editor'"
+        @open-monster-editor="currentEditor = 'monster-editor'"
         @add-map="addMap"
         @add-sprite="addSprite"
       />
@@ -90,6 +92,7 @@ import TileEditor from '@/components/TileEditor.vue'
 import RoomEditor from '@/components/RoomEditor.vue'
 import SpriteEditor from '@/components/SpriteEditor.vue'
 import ItemEditor from '@/components/ItemEditor.vue'
+import MonsterEditor from '@/components/MonsterEditor.vue'
 import NPC from '@/components/NPC.vue'
 import MainControls from '@/components/MainControls.vue'
 import NewMapEditor from '@/components/NewMapEditor.vue'
@@ -105,6 +108,7 @@ export default {
     'room-editor': RoomEditor,
     'sprite-editor': SpriteEditor,
     'item-editor': ItemEditor,
+    'monster-editor': MonsterEditor,
     'new-map-editor': NewMapEditor,
     'npc-editor': NPC,
     'no-editor': MainControls
@@ -117,6 +121,7 @@ export default {
       sprites: {},
       spriteData: {},
       items: {},
+      enemies: {},
       maps: {
         defaultmap: {
           map: [[]],
@@ -238,6 +243,21 @@ export default {
         this.error = 'Warning: you must choose a folder.'
       }
     },
+    async loadFile(fileName, sliceAmount, obj, storeVar) {
+      try {
+        let file = path.join(this.projectPath, fileName)
+        obj[storeVar] = JSON.parse(file.slice(sliceAmount))
+      } catch (err) {
+        if (err instanceof SyntaxError) {
+          this.showNotif('Error parsing ' + storeVar + ' file.')
+        } else {
+          this.showNotif('Error reading ' + storeVar + ' file.')
+        }
+        this.logError(err)
+        return false
+      }
+      return true
+    },
     async loadStuff() {
       let success = true
       this.isLoading = true
@@ -263,6 +283,7 @@ export default {
         let value = this.sprites[key]
         this.spriteData[key] = this.base64(value)
       }
+
       // load items
       let itemFile = path.join(this.projectPath, 'scripts/item.js')
       try {
@@ -273,6 +294,21 @@ export default {
           this.showNotif('Error parsing item file.')
         } else {
           this.showNotif('Error reading item file.')
+        }
+        this.logError(err)
+        success = false
+      }
+
+      // load enemies
+      let enemyFile = path.join(this.projectPath, 'scripts/enemy.js')
+      try {
+        let enemies = await fsprom.readFile(enemyFile, { encoding: 'utf8' })
+        this.enemies = JSON.parse(enemies.slice(13))
+      } catch (err) {
+        if (err instanceof SyntaxError) {
+          this.showNotif('Error parsing enemy file')
+        } else {
+          this.showNotif('Error reading enemy file')
         }
         this.logError(err)
         success = false
@@ -313,6 +349,10 @@ export default {
           let itemtxt = 'var items = ' + JSON.stringify(this.items)
           let itemFile = path.join(this.projectPath, 'scripts/item.js')
           await fsprom.writeFile(itemFile, itemtxt)
+          // saving enemies
+          let enemytxt = 'var enemies = ' + JSON.stringify(this.enemies)
+          let enemyFile = path.join(this.projectPath, 'scripts/enemy.js')
+          await fsprom.writeFile(enemyFile, enemytxt)
           // saving maps
           let maptxt = 'var maps = ' + JSON.stringify(this.maps)
           let mapFile = path.join(this.projectPath, 'scripts/room.js')

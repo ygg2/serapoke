@@ -17,7 +17,7 @@
         :value="command.pickup || command.drop"
         @input="setItem"
       />
-      <v-text-field label="When picking up" v-model="command.message" />
+      <v-text-field :label="messageLabel" v-model="command.message" />
       <v-text-field :label="afterLabel" v-model="command.after" />
       <v-text-field
         v-show="!isPickup"
@@ -68,9 +68,12 @@ export default {
     pickupOrDrop() {
       return this.command.pickup ? 'Pick Up Item' : 'Drop Item'
     },
+    messageLabel() {
+      return this.command.drop ? 'When dropping' : 'When picking up'
+    },
     afterLabel() {
       return (
-        'If you already ' + (this.command.drop ? 'have' : 'dropped') + ' it'
+        'If you already ' + (this.command.drop ? 'dropped' : 'have') + ' it'
       )
     }
   },

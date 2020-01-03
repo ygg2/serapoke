@@ -31,9 +31,9 @@ export default {
     return {
       globalOptionsOpen: false,
       globalOptionsList: [
-        { name: 'sprite', color: 'grey', icon: 'mdi-pencil' },
-        { name: 'item', color: 'pink', icon: 'mdi-pencil' },
-        { name: 'monster', color: 'black', icon: 'mdi-pencil' }
+        { name: 'sprite', color: 'grey', icon: 'mdi-emoticon' },
+        { name: 'item', color: 'pink', icon: 'mdi-briefcase' },
+        { name: 'monster', color: 'black', icon: 'mdi-android' }
       ]
     }
   }

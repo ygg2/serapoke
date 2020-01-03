@@ -7,7 +7,7 @@
         <v-btn icon @click="addSprite">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
-        <v-row justify="end">
+        <v-row justify="end" class="mr-1">
           <v-btn-toggle v-model="sorting" mandatory>
             <v-btn text value="Default" @click="reset">Chronological</v-btn>
             <v-btn text value="Alphabetical" @click="sort">A-Z</v-btn>
@@ -48,8 +48,10 @@
               :error-messages="imageError"
             />
             <v-row justify="end" class="pr-4">
-              <v-btn @click="save">Save</v-btn>
+              <v-btn @click="save">Done</v-btn>
             </v-row>
+            <p>Preview</p>
+            <img :src="spritedata[editingSprite.name]" style="max-width:100%" />
           </v-col>
         </v-row>
       </v-card-text>

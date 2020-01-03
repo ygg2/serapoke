@@ -171,7 +171,7 @@ export default {
         {
           color: 'orange',
           cellType: 'item',
-          icon: 'mdi-pencil'
+          icon: 'mdi-briefcase'
         },
         {
           color: 'red',
