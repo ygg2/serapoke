@@ -12,6 +12,9 @@ var landscape = {
   bridge: true,
   telescope: true,
 };
+var user_vars = {};
+var party = [];
+var battle_data;
 var progress = 0;
 if (localStorage.getItem('save')) {
   var main_menu_item = [
@@ -41,11 +44,19 @@ for (let key of Object.keys(maps)) {
 // player
 player = new Player(0, 0, "mika");
 
+battle_data = {
+  leader_img: new Img(0, 300, false),
+  enemy_img: new Img(0, 0, false),
+  leader_hp: new Text(50, 300),
+  enemy_hp: new Text(600, 50)
+}
+
 // INTRO
 label.main_menu = [
 ()=>{
   player.visible = false;
   bt.adv.box.visible = false;
+  party.push(new Monster("Owlbear"));
 },
 {change:background, image:spr.main_menu},
 {menu:text,
@@ -55,7 +66,8 @@ label.main_menu = [
 label.serapoke_intro = [
 {change:background},
 {change:text, x:80, y:150},
-"Look at this totally epic opening text.",
+{battle:"Tarrasque"},
+{jump:"serapoke_init"},
 "Anyway, thank you for working with me! Definitely@can't do this on my own and I appreciate you a ton.",
 "I hope you have fun too!",
 {transition:"fade"},
