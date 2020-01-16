@@ -55,6 +55,9 @@ var render = function() {
   for (let npc of npcs) npc.draw()
   player.draw();
   room.ctx.restore();
+  for (let img of screen_images) {
+    img.draw();
+  }
   if (in_talk) {
 //    bt.box.draw();
     bt.adv.draw();

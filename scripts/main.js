@@ -159,7 +159,7 @@ function Preload() {
 function Text(x, y, text, color) {
   this.x = x;
   this.y = y;
-  this.text = text;
+  this.text = text || "";
   this.color = color || TEXT_COLOR;
   this.visible = true;
   this.draw = function() {
@@ -237,7 +237,7 @@ function Character(x, y, image) {
   this.visible = true;
   this.mask = {
     x: 0,
-    y: this.image ? this.image.height - GRIDSIZE : 0,
+    y: this.image ? this.image.height - GRIDSIZE / 2 : 0,
     width: GRIDSIZE,
     height: GRIDSIZE
   };
@@ -451,7 +451,12 @@ function Button(button) {
   this.calling_npc = button.calling_npc || false;
   this.action = button.action || function() {
     if (this.label) {
-      bt.Jump(this.label);
+      if (Array.isArray(this.label)) {
+        bt.Insert(...this.label);
+        bt.Next();
+      } else {
+        bt.Jump(this.label);
+      }
       in_menu = false;
     }
     else {
@@ -611,6 +616,40 @@ Menu.prototype.update_choice = function() {
   }
 }
 
+function Monster(name, level) {
+  this.name = name;
+  this.level = level;
+  this.hp = 80;
+  this.damage = function (amount) {
+    this.hp -= amount;
+    if (this.hp > 0) return false;
+    this.hp = 0;
+    return true;
+  }
+  this.moves = [
+    {
+      name: "Yeet",
+      effects: [
+        "\"Hya hya hya\"",
+        {template:"${_leader} yeets the opposing ${_enemy} across the arena"},
+        {damage:40}
+      ]
+    },
+    {
+      name: "Confusion",
+      effects: [
+        {template:"${_leader} hits itself in confusion!"},
+        {damage:40, target:"self"}
+      ]
+    }
+  ]
+}
+
+function BattleUi() {}
+BattleUi.prototype.draw = function() {
+  //
+}
+
 function spawn_npc(npc, solid = true) {
   if (!npc.spawn_condition || landscape[npc.spawn_condition]) {
     npc.x *= GRIDSIZE;
@@ -625,6 +664,7 @@ function spawn_npc(npc, solid = true) {
 // background
 var room_background = new Img(0, 0, BLANK_IMAGE);
 var npcs = [];
+var screen_images = [];
 // create level: make the correct blocks
 function create_level(lvl) {
   room.map = maps[lvl].map;

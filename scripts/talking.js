@@ -16,34 +16,6 @@ var script_pause = 0;
 const no_item = -1;
 var calling_npc = null
 
-/*base variables
-BOX_X
-BOX_Y
-BOX_IMAGE
-*/
-
-/* Sample Script */
-
-// blank
-// blank
-// error with command
-// This is a name
-// nothing
-// error converting image
-label_name = [
-"some text and blah blah blah blah blah",
-"some more text",
-{name: "This is a name"},
-{show: "block", x:0, y:0},
-{show: "block", position: right},
-"Yeet",
-{hide: right},
-{change: box, x:10, y:400},
-{change: text, font: spr.font}, //??? sounds like a bad idea
-"Some intro text@some more intro text",
-"Even more intro text and more text and more text@plenty more text to give use lots of time@to press the button once."
-]
-
 // make the box and stuff
 var bt = {};
 bt.line = 0;
@@ -397,6 +369,86 @@ bt.Next = function() {
         localStorage.setItem(command.save, JSON.stringify(_save));
       }
 
+      else if (command.battle) {
+        // set battle variables
+        user_vars._enemy = command.battle;
+        user_vars._leader = party[0].name;
+        battle_data.enemy = new Monster(command.battle);
+        battle_data.leader = party[0];
+        battle_data.saved_dialogue = story.splice(bt.line);
+        // show images
+        battle_data.enemy_img.image = spr[enemies[command.battle].image];
+        battle_data.leader_img.image = spr[enemies[party[0].name].image];
+        battle_data.enemy_hp.text = battle_data.enemy.hp.toString();
+        battle_data.leader_hp.text = battle_data.leader.hp.toString();
+        screen_images.push(battle_data.enemy_img);
+        screen_images.push(battle_data.leader_img);
+        screen_images.push(battle_data.enemy_hp);
+        screen_images.push(battle_data.leader_hp);
+        // menu
+        let _current_index = bt.line + 3;
+        let _choices = party[0].moves.map(move => {
+          return [
+            move.name, [...move.effects, () => { bt.line = _current_index; }]
+          ];
+        });
+        bt.Insert(
+          {template:"A wild ${_enemy} appeared!"},
+          {template:"Go! ${_leader}!"},
+          {template:"What will ${_leader} do?"},
+          {menu: text, choices: _choices}
+        );
+      }
+
+      else if (command.damage) {
+        let _leader_ko;
+        let _enemy_ko;
+        if (command.target) {
+          _leader_ko = battle_data.leader.damage(command.damage)
+        } else {
+          _enemy_ko = battle_data.enemy.damage(command.damage)
+        }
+        battle_data.enemy_hp.text = battle_data.enemy.hp.toString();
+        battle_data.leader_hp.text = battle_data.leader.hp.toString();
+        if (_leader_ko) {
+          console.log("loss")
+          story = [
+            "You lose",
+            {transition:"fade"},
+            {pause:50},
+            () => { screen_images = [] },
+            "You scurried back to JIDA, protecting your weak and@injured Horsemen from further harm...",
+            {transition:"fade"},
+            {pause:50},
+            ...battle_data.saved_dialogue
+          ];
+          bt.line = 0;
+        }
+        if (_enemy_ko) {
+          story = [
+            "You win",
+            {transition:"fade"},
+            {pause:25},
+            () => { screen_images = [] },
+            {pause:25},
+            ...battle_data.saved_dialogue
+          ];
+          bt.line = 0;
+        }
+      }
+
+      else if (command.setvar) {
+        user_vars[command.setvar] = command.value
+      }
+
+      else if (command.template) {
+        chars_displayed = 0;
+        bt.adv.text.text = command.template.replace(/\$\{.*?\}/g, (match) => {
+          return user_vars[match.slice(2, -1)]
+        })
+        go = false;
+      }
+
       // otherwise, write a debug error
       else {
         console.log("Error with commands. Please check your script");
@@ -404,8 +456,6 @@ bt.Next = function() {
       }
 
     }
-
-    else { console.log("Error with command type. Please check your script"); }
 
   } // end while go
 
