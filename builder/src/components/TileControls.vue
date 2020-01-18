@@ -14,7 +14,7 @@
         />
       </v-col>
     </v-row>
-    <v-row style="width:270px; height:370px; overflow-y:scroll; position:relative">
+    <v-row style="width:280px; height:370px; overflow-y:scroll; position:relative">
       <canvas id="tilePicker" style="background-color:black" width="256" />
       <div class="top-left" style="line-height: 0">
         <div v-for="(cell, i) of tilePicker" :key="i" :style="cellStyle">

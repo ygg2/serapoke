@@ -11,26 +11,26 @@
           />
         </div>
       </div>
+      <npc-button
+        v-for="(door, i) of map.doors"
+        :key="i"
+        :npc="door"
+        :block="3"
+        :spritedata="spritedata"
+        :blocksize="blocksize"
+        @view-npc="viewDoor(i)"
+        @remove-npc="promptRemoveDoor(i)"
+      />
+      <npc-button
+        v-for="(npc, i) of map.npcs"
+        :key="npc.name"
+        :npc="npc"
+        :spritedata="spritedata"
+        :blocksize="blocksize"
+        @view-npc="viewNPC(i)"
+        @remove-npc="promptRemoveNPC(npc.name, i)"
+      />
     </div>
-    <npc-button
-      v-for="(door, i) of map.doors"
-      :key="i"
-      :npc="door"
-      :block="3"
-      :spritedata="spritedata"
-      :blocksize="blocksize"
-      @view-npc="viewDoor(i)"
-      @remove-npc="promptRemoveDoor(i)"
-    />
-    <npc-button
-      v-for="(npc, i) of map.npcs"
-      :key="npc.name"
-      :npc="npc"
-      :spritedata="spritedata"
-      :blocksize="blocksize"
-      @view-npc="viewNPC(i)"
-      @remove-npc="promptRemoveNPC(npc.name, i)"
-    />
     <v-row v-if="editingDoor !== null" align="center" justify="center">
       <div class="full-cover" @click="editingDoor = null" />
       <v-card raised class="center-card mt-4">

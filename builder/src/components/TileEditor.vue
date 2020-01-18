@@ -1,11 +1,16 @@
 <template>
   <div class="top-left">
     <canvas id="tileCanvas">Canvas not loaded</canvas>
-    <div class="top-left">
+    <div
+      class="top-left"
+      @mousedown.left="isAdding = true"
+      @mouseup="isAdding = false"
+    >
       <div v-for="(row, y) of map.map" :key="'y' + y" :style="displayY">
         <div v-for="(block, x) of row" :key="'x' + x" :style="displayX">
           <block-button
             @add-object="addTile(x, y)"
+            @mouse-over="addIfDown(x, y)"
             :coords="placing == 1"
             :x="x"
             :y="y"
@@ -62,6 +67,7 @@ export default {
       lastMap: '',
       canvas: null,
       ctx: null,
+      isAdding: false,
       displayX: {
         display: 'inline-block',
         height: '100%',
@@ -132,6 +138,11 @@ export default {
           )
         }
         this.hasBeenModified = true
+      }
+    },
+    addIfDown(x, y) {
+      if (this.isAdding) {
+        this.addTile(x, y)
       }
     }
   }

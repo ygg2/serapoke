@@ -22,31 +22,32 @@
       @open-npc-editor="currentEditor = 'npc-editor'"
       @create-map="currentEditor = 'new-map-editor'"
     />
-    <v-content style="overflow:scroll" app>
-      <tile-editor
-        :placing="placing"
-        :map="computedMap"
-        :mapname="selectedMap"
-        :tempdata="tempTileMaps"
-        :spritedata="spriteData"
-        :blocksize="blocksize"
-        :tileset="tilesetData"
-        :placingtile="placingtile"
-        @save-temp-map="saveTempMap"
-      />
-      <room-editor
-        class="top-left"
-        v-if="placing == 2"
-        :active="roomEditorActive"
-        :maps="maps"
-        :map="computedMap"
-        :spritedata="spriteData"
-        :objtype="objtype"
-        :npcs="selectedNPCs"
-        :blocksize="blocksize"
-        @set-npc="selectedNPC = $event"
-        @open-npc-editor="currentEditor = 'npc-editor'"
-      />
+    <v-content app>
+      <div style="max-width:100%;overflow:scroll">
+        <tile-editor
+          :placing="placing"
+          :map="computedMap"
+          :mapname="selectedMap"
+          :tempdata="tempTileMaps"
+          :spritedata="spriteData"
+          :blocksize="blocksize"
+          :tileset="tilesetData"
+          :placingtile="placingtile"
+          @save-temp-map="saveTempMap"
+        />
+        <room-editor
+          v-if="placing == 2"
+          :active="roomEditorActive"
+          :maps="maps"
+          :map="computedMap"
+          :spritedata="spriteData"
+          :objtype="objtype"
+          :npcs="selectedNPCs"
+          :blocksize="blocksize"
+          @set-npc="selectedNPC = $event"
+          @open-npc-editor="currentEditor = 'npc-editor'"
+        />
+      </div>
       <component
         :is="currentEditor"
         :selected.sync="selected"
