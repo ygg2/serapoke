@@ -1,5 +1,9 @@
 <template>
-  <div @mousedown.left="isAdding = true" @mouseup="isAdding = false">
+  <div
+    class="top-left"
+    @mousedown.left="isAdding = true"
+    @mouseup="isAdding = false"
+  >
     <div :style="absoluteSize">
       <div v-for="(row, y) of map.map" :key="'y' + y" :style="displayY">
         <div v-for="(block, x) of row" :key="'x' + x" :style="displayX">
@@ -31,75 +35,18 @@
         @remove-npc="promptRemoveNPC(npc.name, i)"
       />
     </div>
-    <v-row v-if="editingDoor !== null" align="center" justify="center">
-      <div class="full-cover" @click="editingDoor = null" />
-      <v-card raised class="center-card mt-4">
-        <v-card-title>Edit Door</v-card-title>
-        <v-card-text>
-          <v-select
-            label="To map"
-            v-model="editingDoor.toMap"
-            :items="Object.keys(maps)"
-          />
-          <v-row>
-            <v-col>
-              <number-input label="to X" v-model="editingDoor.toX" />
-            </v-col>
-            <v-col>
-              <number-input label="to Y" v-model="editingDoor.toY" />
-            </v-col>
-          </v-row>
-          <v-row justify="end" class="pr-4">
-            <v-btn @click="editingDoor = null">Done</v-btn>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-row>
-    <v-row v-show="creatingNPC" align="center" justify="center">
-      <div class="full-cover" @click="creatingNPC = false" />
-      <v-card raised class="center-card mt-4">
-        <v-card-title>
-          New NPC
-          <v-btn @click="creatingNPC = false" absolute right icon>
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-select
-            v-if="moveExisting"
-            v-model="npcToMove"
-            :items="npcs"
-            item-text="name"
-            item-value="name"
-          />
-          <v-text-field
-            v-else
-            id="npcCard"
-            label="Name"
-            v-model="npcName"
-            :error-messages="nameError"
-            @keyup.enter.exact="addNPC"
-          />
-          <v-switch label="Move Existing NPC" v-model="moveExisting" />
-          <v-row justify="end" class="pr-4">
-            <v-btn v-if="moveExisting" @click="moveNPC">Move</v-btn>
-            <v-btn v-else @click="addNPC">Create</v-btn>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-row>
-    <v-row v-show="deletePrompt && !targetDoor" align="center" justify="center">
+    <v-row v-show="deletePrompt && !targetDoor">
       <div class="full-cover" @click="deletePrompt = false" />
-      <v-card raised class="center-card mt-4">
+      <v-card raised :style="deleteStyle">
         <v-card-title>Permanently delete {{ npcToRemove }}?</v-card-title>
         <v-card-text>
           <delete-menu v-model="deletePrompt" @remove="removeNPC" />
         </v-card-text>
       </v-card>
     </v-row>
-    <v-row v-show="deletePrompt && targetDoor" align="center" justify="center">
+    <v-row v-show="deletePrompt && targetDoor">
       <div class="full-cover" @click="deletePrompt = false" />
-      <v-card raised class="center-card mt-4">
+      <v-card raised :style="deleteStyle">
         <v-card-title>Permanently delete door?</v-card-title>
         <v-card-text>
           <delete-menu v-model="deletePrompt" @remove="removeDoor" />
@@ -112,13 +59,11 @@
 <script>
 import BlockButton from '@/components/BlockButton.vue'
 import NPCButton from '@/components/NPCButton.vue'
-import NumberInput from '@/components/NumberInput.vue'
 import DeleteMenu from '@/components/DeleteMenu.vue'
 export default {
   components: {
     'block-button': BlockButton,
     'npc-button': NPCButton,
-    'number-input': NumberInput,
     'delete-menu': DeleteMenu
   },
   props: {
@@ -160,8 +105,8 @@ export default {
       npcToRemove: '',
       indexToRemove: -1,
       deletePrompt: false,
-      npcX: 0,
-      npcY: 0,
+      toRemoveX: 0,
+      toRemoveY: 0,
       targetDoor: false,
       editingDoor: null,
       isAdding: false,
@@ -194,6 +139,21 @@ export default {
       for (let npc of this.npcs)
         if (this.npcName == npc.name) return 'Name must be unique'
       return ''
+    },
+    deleteStyle() {
+      let _left = 0,
+        _top = 0
+      if (!this.map.nomap) {
+        _left = Math.min(this.toRemoveX, this.map.map[0].length - 5)
+        _top = Math.min(this.toRemoveY, this.map.map.length - 2)
+      }
+      if (_left < 0) _left = 0
+      if (_top < 0) _top = 0
+      return {
+        position: 'absolute',
+        left: String(_left * this.blocksize) + 'px',
+        top: String(_top * this.blocksize) + 'px'
+      }
     }
   },
   watch: {
@@ -204,6 +164,8 @@ export default {
   methods: {
     promptRemoveNPC(name, index) {
       if (this.active) {
+        this.toRemoveX = this.npcs[index].x
+        this.toRemoveY = this.npcs[index].y
         this.npcToRemove = name
         this.indexToRemove = index
         this.targetDoor = false
@@ -213,6 +175,8 @@ export default {
     promptRemoveDoor(index) {
       if (this.active) {
         this.indexToRemove = index
+        this.toRemoveX = this.map.doors[index].x
+        this.toRemoveY = this.map.doors[index].y
         this.targetDoor = true
         this.deletePrompt = true
       }
@@ -237,23 +201,21 @@ export default {
             else this.$set(this.map.map[y], x, 1)
             break
           case 1:
-            this.npcX = x
-            this.npcY = y
-            this.npcName = ''
-            this.creatingNPC = true
-            this.$nextTick(() => {
-              document.getElementById('npcCard').focus()
+            this.$emit('open-new-npc-editor', {
+              x: x,
+              y: y,
+              name: ''
             })
             break
           case 2:
-            this.map.doors.push({
+            this.$emit('open-new-door-editor', {
               x: x,
               y: y,
               toX: 0,
               toY: 0,
               toMap: Object.keys(this.maps)[0]
             })
-            this.editingDoor = this.map.doors[this.map.doors.length - 1]
+            break
         }
       }
     },
@@ -264,35 +226,6 @@ export default {
         }
       }
     },
-    addNPC() {
-      if (this.active) {
-        if (this.npcName && !this.nameError) {
-          this.creatingNPC = false
-          this.npcs.push({
-            name: this.npcName,
-            x: this.npcX,
-            y: this.npcY,
-            labels: { Main: [] }
-          })
-          this.$emit('set-npc', this.npcs.length - 1)
-          this.$emit('open-npc-editor')
-        }
-      }
-    },
-    moveNPC() {
-      if (this.npcToMove) {
-        this.creatingNPC = false
-        this.moveExisting = false
-        for (let npc of this.npcs) {
-          if (npc.name == this.npcToMove) {
-            this.$set(npc, 'x', this.npcX)
-            this.$set(npc, 'y', this.npcY)
-            break
-          }
-        }
-        this.npcToMove = ''
-      }
-    },
     viewNPC(index) {
       if (this.active) {
         this.$emit('set-npc', index)
@@ -301,7 +234,7 @@ export default {
     },
     viewDoor(index) {
       if (this.active) {
-        this.editingDoor = this.map.doors[index]
+        this.$emit('open-door-editor', index)
       }
     }
   }

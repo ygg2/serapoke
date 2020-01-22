@@ -22,23 +22,26 @@ if (localStorage.getItem('save')) {
   ]
 } else {
   var main_menu_item = [
-	  ["PLAY", "serapoke_intro"]
+    ["PLAY", "serapoke_intro"],
+    ["battle test", "serapoke_battle_test"]
   ]
 }
 
 function create_objects() {
 //testing
 for (let key of Object.keys(maps)) {
-  label[key] = [
-    ()=>{
-      player.visible = true;
-      bt.adv.box.visible = true;
-    },
-    {room:key}
-  ]
-  main_menu_item.push(
-    [key, key]
-  )
+  if (key != "Title") {
+    label[key] = [
+      ()=>{
+        player.visible = true;
+        bt.adv.box.visible = true;
+      },
+      {room:key}
+    ]
+    main_menu_item.push(
+      [key, key]
+    )
+  }
 }
 
 // player
@@ -50,6 +53,11 @@ battle_data = {
   leader_hp: new Text(50, 300),
   enemy_hp: new Text(600, 50)
 }
+
+label.serapoke_battle_test = [
+{battle:"Tarrasque"},
+{jump:"serapoke_init"},
+]
 
 // INTRO
 label.main_menu = [
@@ -66,9 +74,7 @@ label.main_menu = [
 label.serapoke_intro = [
 {change:background},
 {change:text, x:80, y:150},
-{battle:"Tarrasque"},
-{jump:"serapoke_init"},
-"Anyway, thank you for working with me! Definitely@can't do this on my own and I appreciate you a ton.",
+"Thank you for working with me! Definitely@can't do this on my own and I appreciate you a ton.",
 "I hope you have fun too!",
 {transition:"fade"},
 {pause:50},

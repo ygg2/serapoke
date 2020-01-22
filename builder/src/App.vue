@@ -24,29 +24,37 @@
     />
     <v-content app>
       <div style="max-width:100%;overflow:scroll">
-        <tile-editor
-          :placing="placing"
-          :map="computedMap"
-          :mapname="selectedMap"
-          :tempdata="tempTileMaps"
-          :spritedata="spriteData"
-          :blocksize="blocksize"
-          :tileset="tilesetData"
-          :placingtile="placingtile"
-          @save-temp-map="saveTempMap"
-        />
-        <room-editor
-          v-if="placing == 2"
-          :active="roomEditorActive"
-          :maps="maps"
-          :map="computedMap"
-          :spritedata="spriteData"
-          :objtype="objtype"
-          :npcs="selectedNPCs"
-          :blocksize="blocksize"
-          @set-npc="selectedNPC = $event"
-          @open-npc-editor="currentEditor = 'npc-editor'"
-        />
+        <div
+          style="height: 100vh; background: linear-gradient(black, white); position: relative;"
+          :style="divMapSizing"
+        >
+          <tile-editor
+            :placing="placing"
+            :map="computedMap"
+            :mapname="selectedMap"
+            :tempdata="tempTileMaps"
+            :spritedata="spriteData"
+            :blocksize="blocksize"
+            :tileset="tilesetData"
+            :placingtile="placingtile"
+            @save-temp-map="saveTempMap"
+          />
+          <room-editor
+            v-if="placing == 2"
+            :active="roomEditorActive"
+            :maps="maps"
+            :map="computedMap"
+            :spritedata="spriteData"
+            :objtype="objtype"
+            :npcs="selectedNPCs"
+            :blocksize="blocksize"
+            @set-npc="selectedNPC = $event"
+            @open-npc-editor="currentEditor = 'npc-editor'"
+            @open-new-npc-editor="openNewNPCEditor"
+            @open-new-door-editor="openNewDoorEditor"
+            @open-door-editor="openDoorEditor"
+          />
+        </div>
       </div>
       <component
         :is="currentEditor"
@@ -57,9 +65,12 @@
         :enemies="enemies"
         :npcs="selectedNPCs"
         :map="computedMap"
+        :maps="maps"
         :objtype="objtype"
+        :stored="storedData"
         @open-room-editor="currentEditor = 'no-editor'"
         @open-sprite-editor="currentEditor = 'sprite-editor'"
+        @open-npc-editor="currentEditor = 'npc-editor'"
         @open-item-editor="currentEditor = 'item-editor'"
         @open-monster-editor="currentEditor = 'monster-editor'"
         @add-map="addMap"
@@ -97,6 +108,8 @@ import MonsterEditor from '@/components/MonsterEditor.vue'
 import NPC from '@/components/NPC.vue'
 import MainControls from '@/components/MainControls.vue'
 import NewMapEditor from '@/components/NewMapEditor.vue'
+import NewNPCEditor from '@/components/NewNPCEditor.vue'
+import NewDoorEditor from '@/components/NewDoorEditor.vue'
 var fs = require('fs')
 const fsprom = fs.promises
 var path = require('path')
@@ -112,6 +125,8 @@ export default {
     'monster-editor': MonsterEditor,
     'new-map-editor': NewMapEditor,
     'npc-editor': NPC,
+    'new-npc-editor': NewNPCEditor,
+    'new-door-editor': NewDoorEditor,
     'no-editor': MainControls
   },
   data() {
@@ -144,7 +159,18 @@ export default {
       notif: '',
       notifColor: 'green',
       isLoading: false,
-      isSaving: false
+      isSaving: false,
+      // store for passing data in new npc make method
+      storedData: {
+        x: 0,
+        y: 0,
+        name: '',
+        toX: 0,
+        toY: 0,
+        toMap: '',
+        isNew: false,
+        index: -1
+      }
     }
   },
   computed: {
@@ -163,6 +189,12 @@ export default {
     },
     computedMap() {
       return this.selectedMap ? this.maps[this.selectedMap] : { nomap: true }
+    },
+    divMapSizing() {
+      let _width = this.computedMap.nomap ? 0 : this.computedMap.map[0].length
+      return {
+        width: String(_width * this.blocksize) + 'px'
+      }
     }
   },
   mounted() {
@@ -175,6 +207,32 @@ export default {
     }
   },
   methods: {
+    openNewNPCEditor({ x, y, name }) {
+      this.storedData.x = x
+      this.storedData.y = y
+      this.storedData.name = name
+      this.currentEditor = 'new-npc-editor'
+    },
+    openNewDoorEditor({ x, y, toX, toY, toMap }) {
+      this.storedData.x = x
+      this.storedData.y = y
+      this.storedData.toX = toX
+      this.storedData.toY = toY
+      this.storedData.toMap = toMap
+      this.storedData.isNew = true
+      this.currentEditor = 'new-door-editor'
+    },
+    openDoorEditor(index) {
+      let _door = this.computedMap.doors[index]
+      this.storedData.x = _door.x
+      this.storedData.y = _door.y
+      this.storedData.toX = _door.toX
+      this.storedData.toY = _door.toY
+      this.storedData.toMap = _door.toMap
+      this.storedData.isNew = false
+      this.storedData.index = index
+      this.currentEditor = 'new-door-editor'
+    },
     saveTempMap({ name, image }) {
       if (name && name in this.maps) {
         this.tempTileMaps[name] = image
