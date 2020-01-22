@@ -97,23 +97,6 @@
 </template>
 
 <script>
-/* need icons for
-
-:: items
-  -pick up (item, message, after)
-  -drop item (item, message, backup - dialogue, after - if already dropped)
-
-jump to label (label)
-go to level (level name)
--transition (transition name)
-change sprite (image)
-change background (image)
-change textbox (show, hide, x, y, image)
-change text (x, y)
-
-save (no parameters. pass true.)
-
-*/
 import DialogueName from '@/components/DialogueName.vue'
 import DialogueMenu from '@/components/DialogueMenu.vue'
 import DialogueMove from '@/components/DialogueMove.vue'
@@ -263,7 +246,11 @@ export default {
           this.story.splice(index, 1, { pause: 60 })
           break
         case 'item':
-          this.story.splice(index, 1, { pickup: Object.keys(this.items)[0] })
+          if (this.items) {
+            this.story.splice(index, 1, { pickup: Object.keys(this.items)[0] })
+          } else {
+            this.story.splice(index, 1, { pickup: 'Please create an item.' })
+          }
           break
       }
     }

@@ -23,7 +23,7 @@
       @create-map="currentEditor = 'new-map-editor'"
     />
     <v-content app>
-      <div style="max-width:100%;overflow:scroll">
+      <div style="max-width:100%;overflow:scroll;max-height:95%">
         <div
           style="height: 100vh; background: linear-gradient(black, white); position: relative;"
           :style="divMapSizing"
@@ -239,6 +239,8 @@ export default {
       }
     },
     addMap({ name, width, height, background }) {
+      // add the background sprite
+      this.$set(this.sprites, background, 'maps/' + background + '.png')
       this.$set(this.maps, name, {
         map: [],
         background: background,

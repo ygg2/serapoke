@@ -42,7 +42,7 @@
               label="Spawn Condition"
               v-model="selected.spawn_condition"
             />
-            <v-list style="max-height:245px;overflow-y:scroll">
+            <v-list style="max-height:230px;overflow-y:scroll">
               <v-subheader style="position:relative">
                 Scripts
                 <v-btn absolute right icon small @click="addScript()">
