@@ -4,6 +4,7 @@
     :label="label"
     @input="updateValue"
     @keydown.enter="trueUpdate"
+    :dense="dense"
   />
 </template>
 
@@ -20,6 +21,10 @@ export default {
     value: {
       type: [String, Number],
       default: ''
+    },
+    dense: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

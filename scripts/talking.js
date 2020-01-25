@@ -373,23 +373,29 @@ bt.Next = function() {
         // set battle variables
         user_vars._enemy = command.battle;
         user_vars._leader = party[0].name;
-        battle_data.enemy = new Monster(command.battle);
-        battle_data.leader = party[0];
+        user_vars._turn = "your turn";
+        battle_data = new BattleUi(party[0], new Monster(command.battle));
         battle_data.saved_dialogue = story.splice(bt.line);
-        // show images
-        battle_data.enemy_img.image = spr[enemies[command.battle].image];
-        battle_data.leader_img.image = spr[enemies[party[0].name].image];
-        battle_data.enemy_hp.text = battle_data.enemy.hp.toString();
-        battle_data.leader_hp.text = battle_data.leader.hp.toString();
-        screen_images.push(battle_data.enemy_img);
-        screen_images.push(battle_data.leader_img);
-        screen_images.push(battle_data.enemy_hp);
-        screen_images.push(battle_data.leader_hp);
+        screen_images.push(battle_data);
         // menu
-        let _current_index = bt.line + 3;
+        let _current_index = bt.line + 2;
         let _choices = party[0].moves.map(move => {
+          // enemy does random move
+          let _enemy_move = battle_data.enemy.moves[battle_data.enemy.moves.length * Math.random() | 0];
           return [
-            move.name, [...move.effects, () => { bt.line = _current_index; }]
+            `${move.name} [${move.power}]`, [
+              ...move.effects,
+              () => {
+                [user_vars._enemy, user_vars._leader] = [user_vars._leader, user_vars._enemy];
+                user_vars._turn = "the opponent's turn";
+              },
+              ..._enemy_move.effects,
+              () => {
+                [user_vars._enemy, user_vars._leader] = [user_vars._leader, user_vars._enemy];
+                user_vars._turn = "your turn";
+              },
+              () => { bt.line = _current_index; }
+            ]
           ];
         });
         bt.Insert(
@@ -403,13 +409,15 @@ bt.Next = function() {
       else if (command.damage) {
         let _leader_ko;
         let _enemy_ko;
-        if (command.target) {
-          _leader_ko = battle_data.leader.damage(command.damage)
+        // hit self + your turn, or not hit self + opp turn
+        if ((command.target && user_vars._turn == "your turn")
+          || (!command.target && user_vars._turn != "your turn")) {
+          let _damage = command.damage / 100 * battle_data.enemy.atk * battle_data.enemy.atk_mul;
+          _leader_ko = battle_data.leader.damage(_damage)
         } else {
-          _enemy_ko = battle_data.enemy.damage(command.damage)
+          let _damage = command.damage / 100 * battle_data.leader.atk * battle_data.leader.atk_mul;
+          _enemy_ko = battle_data.enemy.damage(_damage)
         }
-        battle_data.enemy_hp.text = battle_data.enemy.hp.toString();
-        battle_data.leader_hp.text = battle_data.leader.hp.toString();
         if (_leader_ko) {
           console.log("loss")
           story = [
@@ -417,7 +425,7 @@ bt.Next = function() {
             {transition:"fade"},
             {pause:50},
             () => { screen_images = [] },
-            "You scurried back to JIDA, protecting your weak and@injured Horsemen from further harm...",
+            "Mika scurried back to JIDA, protecting his weak and@injured Horsemen from further harm...",
             {transition:"fade"},
             {pause:50},
             ...battle_data.saved_dialogue

@@ -1,13 +1,12 @@
 <template>
-  <v-card color="#ffcccc">
+  <v-card dark>
     <v-card-text>
       <v-text-field
-        label="Pause"
-        :value="command.pause"
-        @input="updatePause"
+        label="Damage"
+        :value="command.damage"
+        @input="updateDamage"
         type="number"
-        suffix="frames"
-        color="red"
+        suffix="x"
       >
         <template v-slot:append-outer v-if="!deletePrompt">
           <v-btn icon small @click="deletePrompt = true">
@@ -16,6 +15,7 @@
         </template>
       </v-text-field>
       <delete-menu v-model="deletePrompt" @remove="$emit('remove-action')" />
+      <v-checkbox v-model="command.target" label="Target Self" hide-details />
     </v-card-text>
   </v-card>
 </template>
@@ -38,10 +38,10 @@ export default {
     }
   },
   methods: {
-    updatePause(amount) {
+    updateDamage(amount) {
       let parsed = parseInt(amount, 10)
       if (isNaN(parsed)) this.command.pause = 0
-      else this.command.pause = parsed
+      else this.command.damage = parsed
     }
   }
 }

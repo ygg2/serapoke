@@ -619,35 +619,50 @@ Menu.prototype.update_choice = function() {
 function Monster(name, level) {
   this.name = name;
   this.level = level;
-  this.hp = 80;
+  this.maxhp = enemies[name].hp;
+  this.hp = enemies[name].hp;
+  this.speed = enemies[name].speed;
+  this.atk = enemies[name].atk;
+  this.def = enemies[name].def;
+  this.atk_mul = 1;
+  this.def_mul = 1;
+  this.image = new Img(0, 0, spr[enemies[name].image]);
   this.damage = function (amount) {
     this.hp -= amount;
+    if (this.hp > this.maxhp) this.hp = this.maxhp;
     if (this.hp > 0) return false;
     this.hp = 0;
     return true;
   }
-  this.moves = [
-    {
-      name: "Yeet",
-      effects: [
-        "\"Hya hya hya\"",
-        {template:"${_leader} yeets the opposing ${_enemy} across the arena"},
-        {damage:40}
-      ]
-    },
-    {
-      name: "Confusion",
-      effects: [
-        {template:"${_leader} hits itself in confusion!"},
-        {damage:40, target:"self"}
-      ]
-    }
-  ]
+  this.moves = enemies[name].moves;
 }
 
-function BattleUi() {}
+function BattleUi(leader, enemy) {
+  this.leader = leader;
+  this.enemy = enemy;
+  // position sprites
+  this.leader.image.x = 0;
+  this.leader.image.y = 300;
+  this.enemy.image.x = 0;
+  this.enemy.image.y = 0;
+  this.leaderhp = new Text(40, 245, "HP:")
+  this.enemyhp = new Text(480, 10, "HP:")
+}
 BattleUi.prototype.draw = function() {
-  //
+  this.enemy.image.draw();
+  this.leader.image.draw();
+  // hp ratio
+  this.leaderhp.text = `HP: ${this.leader.hp}/${this.leader.maxhp}`
+  this.enemyhp.text = `HP: ${this.enemy.hp}/${this.enemy.maxhp}`
+  this.leaderhp.draw();
+  this.enemyhp.draw();
+  // hp bars
+  let _percent = this.enemy.hp / this.enemy.maxhp;
+  room.ctx.fillStyle = `rgb(${(1 - _percent) * 255}, ${_percent * 255}, 0)`;
+  room.ctx.fillRect(XSIZE - 220, 40, _percent * 200, 20);
+  _percent = this.leader.hp / this.leader.maxhp;
+  room.ctx.fillStyle = `rgb(${(1 - _percent) * 255}, ${_percent * 255}, 0)`;
+  room.ctx.fillRect(20, YSIZE - 240, _percent * 200, 20);
 }
 
 function spawn_npc(npc, solid = true) {

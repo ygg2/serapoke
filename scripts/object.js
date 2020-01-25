@@ -14,7 +14,7 @@ var landscape = {
 };
 var user_vars = {};
 var party = [];
-var battle_data;
+var battle_data = {};
 var progress = 0;
 if (localStorage.getItem('save')) {
   var main_menu_item = [
@@ -46,13 +46,6 @@ for (let key of Object.keys(maps)) {
 
 // player
 player = new Player(0, 0, "mika");
-
-battle_data = {
-  leader_img: new Img(0, 300, false),
-  enemy_img: new Img(0, 0, false),
-  leader_hp: new Text(50, 300),
-  enemy_hp: new Text(600, 50)
-}
 
 label.serapoke_battle_test = [
 {battle:"Tarrasque"},

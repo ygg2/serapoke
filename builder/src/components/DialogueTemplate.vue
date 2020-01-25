@@ -1,13 +1,17 @@
 <template>
-  <v-card color="#ffcccc">
+  <v-card color="#ffeecc">
     <v-card-text>
       <v-text-field
-        label="Pause"
-        :value="command.pause"
-        @input="updatePause"
-        type="number"
-        suffix="frames"
-        color="red"
+        label="Template"
+        v-model="command.template"
+        :id="index"
+        @keyup.enter="$emit('create-next')"
+        @keyup.up.exact="$emit('focus-prev')"
+        @keyup.down.exact="$emit('focus-next')"
+        @keyup.shift.up="$emit('add-cell-prev')"
+        @keyup.shift.down="$emit('add-cell-next')"
+        @keyup.shift.enter="$emit('add-cell-next')"
+        color="orange"
       >
         <template v-slot:append-outer v-if="!deletePrompt">
           <v-btn icon small @click="deletePrompt = true">
@@ -30,18 +34,15 @@ export default {
     command: {
       type: Object,
       required: true
+    },
+    index: {
+      type: String,
+      required: true
     }
   },
   data() {
     return {
       deletePrompt: false
-    }
-  },
-  methods: {
-    updatePause(amount) {
-      let parsed = parseInt(amount, 10)
-      if (isNaN(parsed)) this.command.pause = 0
-      else this.command.pause = parsed
     }
   }
 }
