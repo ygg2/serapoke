@@ -105,12 +105,14 @@
 import DialogueDamage from '@/components/DialogueDamage.vue'
 import DialogueTemplate from '@/components/DialogueTemplate.vue'
 import DialogueTransition from '@/components/DialogueTransition.vue'
+import DialogueStatboost from '@/components/DialogueStatboost.vue'
 import DialoguePause from '@/components/DialoguePause.vue'
 export default {
   components: {
     'dialogue-damage': DialogueDamage,
     'dialogue-template': DialogueTemplate,
     'dialogue-transition': DialogueTransition,
+    'dialogue-statboost': DialogueStatboost,
     'dialogue-pause': DialoguePause
   },
   props: {
@@ -149,6 +151,11 @@ export default {
           icon: 'mdi-transition-masked'
         },
         {
+          color: 'grey',
+          cellType: 'statboost',
+          icon: 'mdi-plus-one'
+        },
+        {
           color: 'amber',
           cellType: 'template',
           icon: 'mdi-auto-fix'
@@ -167,6 +174,7 @@ export default {
       else if (line.damage || line.damage === 0) return 'dialogue-damage'
       else if (line.transition) return 'dialogue-transition'
       else if (line.pause || line.pause === 0) return 'dialogue-pause'
+      else if (line.statboost) return 'dialogue-statboost'
     },
     addCell() {
       this.move.effects.push('')
@@ -229,6 +237,11 @@ export default {
         case 'pause':
           this.move.effects.splice(index, 1, { pause: 60 })
           break
+        case 'statboost':
+          this.move.effects.splice(index, 1, {
+            statboost: 'atk_mul',
+            relative: false
+          })
       }
     }
   }

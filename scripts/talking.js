@@ -371,25 +371,27 @@ bt.Next = function() {
 
       else if (command.battle) {
         // set battle variables
-        user_vars._enemy = command.battle;
+        user_vars._enemy = enemies[command.battle].name;
         user_vars._leader = party[0].name;
         user_vars._turn = "your turn";
         battle_data = new BattleUi(party[0], new Monster(command.battle));
         battle_data.saved_dialogue = story.splice(bt.line);
+        battle_data.loss_label = command.loss || battle_data.saved_dialogue;
         screen_images.push(battle_data);
         // menu
         let _current_index = bt.line + 2;
         let _choices = party[0].moves.map(move => {
-          // enemy does random move
-          let _enemy_move = battle_data.enemy.moves[battle_data.enemy.moves.length * Math.random() | 0];
           return [
             `${move.name} [${move.power}]`, [
               ...move.effects,
               () => {
                 [user_vars._enemy, user_vars._leader] = [user_vars._leader, user_vars._enemy];
                 user_vars._turn = "the opponent's turn";
+                // enemy does random move
+                let _enemy_move = battle_data.enemy.moves[battle_data.enemy.moves.length * Math.random() | 0];
+                bt.Insert(..._enemy_move.effects);
+                console.log(_enemy_move.name)
               },
-              ..._enemy_move.effects,
               () => {
                 [user_vars._enemy, user_vars._leader] = [user_vars._leader, user_vars._enemy];
                 user_vars._turn = "your turn";
@@ -406,16 +408,32 @@ bt.Next = function() {
         );
       }
 
+      else if (command.statboost) {
+        if (command.relative) {
+          if (user_vars._turn == "your turn") {
+            battle_data.leader[command.statboost] += command.value;
+          } else {
+            battle_data.enemy[command.statboost] += command.value;
+          }
+        } else {
+          if (user_vars._turn == "your turn") {
+            battle_data.leader[command.statboost] = command.value;
+          } else {
+            battle_data.enemy[command.statboost] = command.value;
+          }
+        }
+      }
+
       else if (command.damage) {
         let _leader_ko;
         let _enemy_ko;
         // hit self + your turn, or not hit self + opp turn
         if ((command.target && user_vars._turn == "your turn")
           || (!command.target && user_vars._turn != "your turn")) {
-          let _damage = command.damage / 100 * battle_data.enemy.atk * battle_data.enemy.atk_mul;
+          let _damage = command.damage / 100 * battle_data.enemy.atk * battle_data.enemy.atk_mul - battle_data.leader.def * battle_data.leader.def_mul * command.damage / 200;
           _leader_ko = battle_data.leader.damage(_damage)
         } else {
-          let _damage = command.damage / 100 * battle_data.leader.atk * battle_data.leader.atk_mul;
+          let _damage = command.damage / 100 * battle_data.leader.atk * battle_data.leader.atk_mul - battle_data.enemy.def * battle_data.enemy.def_mul * command.damage / 200;
           _enemy_ko = battle_data.enemy.damage(_damage)
         }
         if (_leader_ko) {
@@ -425,7 +443,7 @@ bt.Next = function() {
             {transition:"fade"},
             {pause:50},
             () => { screen_images = [] },
-            "Mika scurried back to JIDA, protecting his weak and@injured Horsemen from further harm...",
+            "Mika scurried back to JIDA...",
             {transition:"fade"},
             {pause:50},
             ...battle_data.saved_dialogue
@@ -439,7 +457,7 @@ bt.Next = function() {
             {pause:25},
             () => { screen_images = [] },
             {pause:25},
-            ...battle_data.saved_dialogue
+            ...battle_data.loss_label
           ];
           bt.line = 0;
         }

@@ -48,7 +48,7 @@ for (let key of Object.keys(maps)) {
 player = new Player(0, 0, "mika");
 
 label.serapoke_battle_test = [
-{battle:"Tarrasque", lose:"serapoke_battle_loss"},
+{battle:"crowley", lose:"serapoke_battle_loss"},
 {jump:"serapoke_init"},
 ]
 
@@ -61,7 +61,7 @@ label.main_menu = [
 ()=>{
   player.visible = false;
   bt.adv.box.visible = false;
-  party.push(new Monster("Owlbear"));
+  party.push(new Monster("mika_normal"));
 },
 {change:background, image:spr.main_menu},
 {menu:text,
@@ -85,7 +85,7 @@ label.serapoke_init = [
   bt.adv.box.visible = true;
   inventory.boots = items.boots;
 },
-{room:"Snow Cave"}
+{room:"JIDA"}
 ]
 
 label.serapoke_load = [

@@ -618,7 +618,7 @@ Menu.prototype.update_choice = function() {
 }
 
 function Monster(name, level) {
-  this.name = name;
+  this.name = enemies[name].name;
   this.level = level;
   this.maxhp = enemies[name].hp;
   this.hp = enemies[name].hp;
@@ -643,10 +643,10 @@ function BattleUi(leader, enemy) {
   this.enemy = enemy;
   // position sprites
   this.leader.image.x = 0;
-  this.leader.image.y = 300;
-  this.enemy.image.x = 0;
-  this.enemy.image.y = 0;
-  this.leaderhp = new Text(40, 245, "HP:")
+  this.leader.image.y = 230;
+  this.enemy.image.x = 500;
+  this.enemy.image.y = 80;
+  this.leaderhp = new Text(40, 160, "HP:")
   this.enemyhp = new Text(480, 10, "HP:")
 }
 BattleUi.prototype.draw = function() {
@@ -663,7 +663,7 @@ BattleUi.prototype.draw = function() {
   room.ctx.fillRect(XSIZE - 220, 40, _percent * 200, 20);
   _percent = this.leader.hp / this.leader.maxhp;
   room.ctx.fillStyle = `rgb(${(1 - _percent) * 255}, ${_percent * 255}, 0)`;
-  room.ctx.fillRect(20, YSIZE - 240, _percent * 200, 20);
+  room.ctx.fillRect(20, 190, _percent * 200, 20);
 }
 
 function spawn_npc(npc, solid = true) {
