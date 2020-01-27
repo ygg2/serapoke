@@ -236,8 +236,8 @@ function Character(x, y, image) {
   this.image = spr[image];
   this.visible = true;
   this.mask = {
-    x: 0,
-    y: this.image ? this.image.height - GRIDSIZE / 2 : 0,
+    x: GRIDSIZE / 2,
+    y: this.image ? this.image.height - GRIDSIZE + GRIDSIZE / 3 : 0,
     width: GRIDSIZE,
     height: GRIDSIZE
   };
@@ -328,6 +328,7 @@ Character.prototype = {
         }
       }
     } else if (this.vsp != 0) {
+      entities.sort((a, b) => a.y - b.y); // depth sorting
       for (var i = 0; i < Math.abs(this.vsp); i++) {
         if (!place_meeting(this, this.x, this.y + sign(this.vsp), blocks)) {
           this.y += sign(this.vsp);
@@ -345,14 +346,14 @@ function Player(x, y, image) {
 }
 Player.prototype = new Character();
 Player.prototype.get_input = function() {
-    return {
-      r: keyboard_check(vk_right),
-      l: keyboard_check(vk_left),
-      u: keyboard_check(vk_up),
-      d: keyboard_check(vk_down),
-      run: keyboard_check(vk_shift)
-    }
+  return {
+    r: keyboard_check(vk_right),
+    l: keyboard_check(vk_left),
+    u: keyboard_check(vk_up),
+    d: keyboard_check(vk_down),
+    run: keyboard_check(vk_shift)
   }
+}
 
 function Npc({labels, name, image, x, y, spawn_condition, mask}) {
   Character.call(this, 0, 0, image)
@@ -679,6 +680,7 @@ function spawn_npc(npc, solid = true) {
 // background
 var room_background = new Img(0, 0, BLANK_IMAGE);
 var npcs = [];
+var entities = [];
 var screen_images = [];
 // create level: make the correct blocks
 function create_level(lvl) {
@@ -707,6 +709,7 @@ function create_level(lvl) {
   blocks.push(...nonnpcs);
   player.x = GRIDSIZE * maps[lvl].spawnx || 0;
   player.y = GRIDSIZE * maps[lvl].spawny || 0;
+  entities = [player, ...npcs];
   if (maps[lvl].creation_code) {
     maps[lvl].creation_code();
   }

@@ -51,15 +51,18 @@ var render = function() {
   room.ctx.translate(-drawx, -drawy)
   //room.ctx.scale(2,2)
   room_background.draw();
-//  for (let block of blocks) { block.draw(); }
-  for (let npc of npcs) npc.draw()
-  player.draw();
+  //for (let block of blocks) block.draw();
+  for (let entity of entities) {
+    entity.draw();
+    //room.ctx.globalAlpha = .5;
+    //room.ctx.fillRect(entity.x, entity.y, GRIDSIZE, GRIDSIZE);
+    //room.ctx.globalAlpha = 1;
+  }
   room.ctx.restore();
   for (let img of screen_images) {
     img.draw();
   }
   if (in_talk) {
-//    bt.box.draw();
     bt.adv.draw();
   }
   for (i=0;i<overlay.length;i++) {

@@ -101,6 +101,7 @@ import DialogueName from '@/components/DialogueName.vue'
 import DialogueMenu from '@/components/DialogueMenu.vue'
 import DialogueMove from '@/components/DialogueMove.vue'
 import DialogueItem from '@/components/DialogueItem.vue'
+import DialogueVar from '@/components/DialogueVar.vue'
 import DialoguePause from '@/components/DialoguePause.vue'
 export default {
   components: {
@@ -108,6 +109,7 @@ export default {
     'dialogue-menu': DialogueMenu,
     'dialogue-move': DialogueMove,
     'dialogue-item': DialogueItem,
+    'dialogue-var': DialogueVar,
     'dialogue-pause': DialoguePause
   },
   props: {
@@ -157,6 +159,11 @@ export default {
           icon: 'mdi-briefcase'
         },
         {
+          color: 'cyan',
+          cellType: 'var',
+          icon: 'mdi-code-tags'
+        },
+        {
           color: 'red',
           cellType: 'pause',
           icon: 'mdi-pause'
@@ -186,6 +193,7 @@ export default {
       else if (line.move || line.move === 0) return 'dialogue-move'
       else if (line.pause || line.pause === 0) return 'dialogue-pause'
       else if (line.pickup || line.drop) return 'dialogue-item'
+      else if (line.setvar || line.setvar === '') return 'dialogue-var'
     },
     addCell() {
       this.story.push('')
@@ -252,6 +260,8 @@ export default {
             this.story.splice(index, 1, { pickup: 'Please create an item.' })
           }
           break
+        case 'var':
+          this.story.splice(index, 1, { setvar: '', value: '' })
       }
     }
   }

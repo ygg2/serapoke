@@ -48,8 +48,12 @@ for (let key of Object.keys(maps)) {
 player = new Player(0, 0, "mika");
 
 label.serapoke_battle_test = [
-{battle:"Tarrasque"},
+{battle:"Tarrasque", lose:"serapoke_battle_loss"},
 {jump:"serapoke_init"},
+]
+
+label.serapoke_battle_loss = [
+{room:"JIDA"}
 ]
 
 // INTRO
