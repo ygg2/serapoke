@@ -73,6 +73,7 @@
                     <v-progress-circular indeterminate />
                   </template>
                 </v-img>
+                <p>Stat total: {{ statTotal }}</p>
               </v-col>
             </v-row>
             <v-subheader style="position:relative">
@@ -146,6 +147,16 @@ export default {
       deleting: -1,
       prev: '',
       sorting: 'Default'
+    }
+  },
+  computed: {
+    statTotal() {
+      return (
+        this.editingEnemy.atk +
+        this.editingEnemy.def +
+        this.editingEnemy.speed +
+        this.editingEnemy.hp
+      )
     }
   },
   methods: {

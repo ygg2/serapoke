@@ -388,9 +388,15 @@ bt.Next = function() {
                 [user_vars._enemy, user_vars._leader] = [user_vars._leader, user_vars._enemy];
                 user_vars._turn = "the opponent's turn";
                 // enemy does random move
-                let _enemy_move = battle_data.enemy.moves[battle_data.enemy.moves.length * Math.random() | 0];
+                let _random = battle_data.enemy.moves.length * Math.random() |0;
+                if (battle_data.check_prev(battle_data.enemy.moves[_random])) {
+                  _random++;
+                }
+                if (_random >= battle_data.enemy.moves.length) _random = 0;
+                let _enemy_move = battle_data.enemy.moves[_random];
+                battle_data.prev_moves.push(_enemy_move.name);
                 bt.Insert(..._enemy_move.effects);
-                console.log(_enemy_move.name)
+                console.log("Opponent Move: " + _enemy_move.name)
               },
               () => {
                 [user_vars._enemy, user_vars._leader] = [user_vars._leader, user_vars._enemy];
@@ -401,8 +407,7 @@ bt.Next = function() {
           ];
         });
         bt.Insert(
-          {template:"A wild ${_enemy} appeared!"},
-          {template:"Go! ${_leader}!"},
+          {template:"You are challeneged by ${_enemy}!"},
           {template:"What will ${_leader} do?"},
           {menu: text, choices: _choices}
         );
@@ -430,10 +435,10 @@ bt.Next = function() {
         // hit self + your turn, or not hit self + opp turn
         if ((command.target && user_vars._turn == "your turn")
           || (!command.target && user_vars._turn != "your turn")) {
-          let _damage = command.damage / 100 * battle_data.enemy.atk * battle_data.enemy.atk_mul - battle_data.leader.def * battle_data.leader.def_mul * command.damage / 200;
+          let _damage = battle_data.calc_damage(battle_data.enemy, battle_data.leader, command.damage);
           _leader_ko = battle_data.leader.damage(_damage)
         } else {
-          let _damage = command.damage / 100 * battle_data.leader.atk * battle_data.leader.atk_mul - battle_data.enemy.def * battle_data.enemy.def_mul * command.damage / 200;
+          let _damage = battle_data.calc_damage(battle_data.leader, battle_data.enemy, command.damage);
           _enemy_ko = battle_data.enemy.damage(_damage)
         }
         if (_leader_ko) {

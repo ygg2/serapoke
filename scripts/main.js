@@ -620,22 +620,39 @@ Menu.prototype.update_choice = function() {
 function Monster(name, level) {
   this.name = enemies[name].name;
   this.level = level;
-  this.maxhp = enemies[name].hp;
+  this.max_hp = enemies[name].hp;
   this.hp = enemies[name].hp;
   this.speed = enemies[name].speed;
   this.atk = enemies[name].atk;
   this.def = enemies[name].def;
-  this.atk_mul = 1;
-  this.def_mul = 1;
+  this.atk_mul = 0;
+  this.def_mul = 0;
   this.image = new Img(0, 0, spr[enemies[name].image]);
   this.damage = function (amount) {
     this.hp -= amount;
-    if (this.hp > this.maxhp) this.hp = this.maxhp;
+    if (this.hp > this.max_hp) this.hp = this.max_hp;
     if (this.hp > 0) return false;
     this.hp = 0;
     return true;
   }
   this.moves = enemies[name].moves;
+  this.hp_text = new Text(0, 0, "");
+  this.stat_text = new Text(0, 0, "");
+}
+Monster.prototype.draw = function(is_enemy) {
+  this.image.draw();
+  this.hp_text.text = `HP: ${this.hp}/${this.max_hp}`;
+  this.hp_text.draw();
+  // hp bar
+  let _percent = this.hp / this.max_hp;
+  room.ctx.fillStyle = `rgb(${(1 - _percent) * 255}, ${_percent * 255}, 0)`;
+  if (is_enemy) room.ctx.fillRect(XSIZE - 220, 40, _percent * 200, 20);
+  else room.ctx.fillRect(20, 190, _percent * 200, 20);
+  // stat boosts
+  this.stat_text.text = "";
+  if (this.atk_mul) this.stat_text.text += `Atk + ${this.atk_mul}`;
+  if (this.def_mul) this.stat_text.text += `Def + ${this.def_mul}`;
+  this.stat_text.draw();
 }
 
 function BattleUi(leader, enemy) {
@@ -646,24 +663,42 @@ function BattleUi(leader, enemy) {
   this.leader.image.y = 230;
   this.enemy.image.x = 500;
   this.enemy.image.y = 80;
-  this.leaderhp = new Text(40, 160, "HP:")
-  this.enemyhp = new Text(480, 10, "HP:")
+  this.leader.hp_text.x = 40;
+  this.leader.hp_text.y = 160;
+  this.enemy.hp_text.x = 480;
+  this.enemy.hp_text.y = 10;
+  this.leader.stat_text.x = 150;
+  this.leader.stat_text.y = 220;
+  this.enemy.stat_text.x = 400;
+  this.enemy.stat_text.y = 90;
+  // establish previous moves, dialogue after win, dialogue after loss
+  this.prev_moves = [];
+  this.save_dialogue = [];
+  this.loss_label = [];
 }
 BattleUi.prototype.draw = function() {
-  this.enemy.image.draw();
-  this.leader.image.draw();
-  // hp ratio
-  this.leaderhp.text = `HP: ${this.leader.hp}/${this.leader.maxhp}`
-  this.enemyhp.text = `HP: ${this.enemy.hp}/${this.enemy.maxhp}`
-  this.leaderhp.draw();
-  this.enemyhp.draw();
-  // hp bars
-  let _percent = this.enemy.hp / this.enemy.maxhp;
-  room.ctx.fillStyle = `rgb(${(1 - _percent) * 255}, ${_percent * 255}, 0)`;
-  room.ctx.fillRect(XSIZE - 220, 40, _percent * 200, 20);
-  _percent = this.leader.hp / this.leader.maxhp;
-  room.ctx.fillStyle = `rgb(${(1 - _percent) * 255}, ${_percent * 255}, 0)`;
-  room.ctx.fillRect(20, 190, _percent * 200, 20);
+  this.leader.draw();
+  this.enemy.draw(true);
+}
+BattleUi.prototype.check_prev = function(move) {
+  let _len = this.prev_moves.length;
+  if (_len > 1) {
+    if (this.prev_moves[_len - 1] == this.prev_moves[_len - 2]) {
+      if (this.prev_moves[_len - 1] == move.name) {
+        return true
+      }
+    }
+  }
+  return false
+}
+BattleUi.prototype.calc_damage = function(att, opp, dmg) {
+  if (dmg < 0) return dmg / 100 * opp.hp;
+  return Math.max(1, Math.round(
+    dmg / 100 * (
+      att.atk * (1 + att.atk_mul / 10) -
+      opp.def * (1 + opp.def_mul / 10) / 2
+    )
+  ));
 }
 
 function spawn_npc(npc, solid = true) {

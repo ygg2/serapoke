@@ -75,6 +75,7 @@
         @open-monster-editor="currentEditor = 'monster-editor'"
         @add-map="addMap"
         @add-sprite="addSprite"
+        @set-npc="selectedNPC = $event"
       />
       <v-snackbar
         v-model="notifVisible"

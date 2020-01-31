@@ -71,21 +71,29 @@ label.main_menu = [
 label.serapoke_intro = [
 {change:background},
 {change:text, x:80, y:150},
-"Thank you for working with me! Definitely@can't do this on my own and I appreciate you a ton.",
-"I hope you have fun too!",
+"In this world, where there are many dangers...@                                        @...JIDA keeps the world at peace.",
 {transition:"fade"},
 {pause:50},
 {jump:"serapoke_init"}
 ]
 label.serapoke_init = [
 {change:text, x:80, y:400},
-{move:'player', teleport:true, x:17, y:14},
 ()=>{
   player.visible = true;
   bt.adv.box.visible = true;
   inventory.boots = items.boots;
 },
-{room:"JIDA"}
+{room:"JIDA"},
+{name:"???"},
+"There you are, Mika!",
+{hide:"box"},
+{move:1, dir:"r", run:true},
+{pause:40},
+{move:1, dir:"s"},
+{show:"box"},
+{name:"Sayuri"},
+"I see you're dressed for your mission already.",
+"As long as you keep your head down, the vampires@won't be suspicious.",
 ]
 
 label.serapoke_load = [
