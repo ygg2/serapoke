@@ -78,6 +78,7 @@
             :labels="Object.keys(selected.labels)"
             :npcs="npcs"
             :items="items"
+            :enemies="enemies"
             @update-name="updateScriptName"
           />
         </v-col>
@@ -108,6 +109,10 @@ export default {
       required: true
     },
     items: {
+      type: Object,
+      required: true
+    },
+    enemies: {
       type: Object,
       required: true
     }

@@ -81,6 +81,7 @@
           :npcs="npcs"
           :index="name + i"
           :items="items"
+          :enemies="enemies"
           @create-next="createNext(name, i)"
           @remove-action="removeCell(name, i)"
           @focus-next="focusNext(name, i)"
@@ -97,6 +98,7 @@
 </template>
 
 <script>
+import DialogueBattle from '@/components/DialogueBattle.vue'
 import DialogueName from '@/components/DialogueName.vue'
 import DialogueMenu from '@/components/DialogueMenu.vue'
 import DialogueMove from '@/components/DialogueMove.vue'
@@ -105,6 +107,7 @@ import DialogueVar from '@/components/DialogueVar.vue'
 import DialoguePause from '@/components/DialoguePause.vue'
 export default {
   components: {
+    'dialogue-battle': DialogueBattle,
     'dialogue-name': DialogueName,
     'dialogue-menu': DialogueMenu,
     'dialogue-move': DialogueMove,
@@ -134,6 +137,10 @@ export default {
       required: true
     },
     items: {
+      type: Object,
+      required: true
+    },
+    enemies: {
       type: Object,
       required: true
     }
@@ -182,6 +189,11 @@ export default {
           color: 'blue',
           cellType: 'name',
           icon: 'mdi-account-card-details'
+        },
+        {
+          color: 'pink',
+          cellType: 'battle',
+          icon: 'mdi-google-photos'
         }
       ]
     }
@@ -194,6 +206,7 @@ export default {
       else if (line.pause || line.pause === 0) return 'dialogue-pause'
       else if (line.pickup || line.drop) return 'dialogue-item'
       else if (line.setvar || line.setvar === '') return 'dialogue-var'
+      else if (line.battle || line.battle === '') return 'dialogue-battle'
     },
     addCell() {
       this.story.push('')
@@ -262,6 +275,16 @@ export default {
           break
         case 'var':
           this.story.splice(index, 1, { setvar: '', value: '' })
+          break
+        case 'battle':
+          if (this.enemies) {
+            this.story.splice(index, 1, {
+              battle: Object.keys(this.enemies)[0]
+            })
+          } else {
+            this.story.splice(index, 1, { battle: 'Please create an enemy.' })
+          }
+          break
       }
     }
   }

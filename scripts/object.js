@@ -8,11 +8,11 @@ var inventory = {};
 var quests = {};
 var finished_quests = {};
 var transitions;
-var landscape = {
-  bridge: true,
-  telescope: true,
+var user_vars = {
+  entered_territory: false,
+  looking_for_yuu: false,
+  before_end: true
 };
-var user_vars = {};
 var party = [];
 var battle_data = {};
 var progress = 0;
@@ -23,7 +23,6 @@ if (localStorage.getItem('save')) {
 } else {
   var main_menu_item = [
     ["PLAY", "serapoke_intro"],
-    ["battle test", "serapoke_battle_test"]
   ]
 }
 
@@ -47,13 +46,12 @@ for (let key of Object.keys(maps)) {
 // player
 player = new Player(0, 0, "mika");
 
-label.serapoke_battle_test = [
-{battle:"crowley", lose:"serapoke_battle_loss"},
-{jump:"serapoke_init"},
-]
-
-label.serapoke_battle_loss = [
-{room:"JIDA"}
+// adding functionality that isn't in the builder
+maps.JIDA.npcs[3].labels.Main = [
+  () => {
+    if (inventory.device) bt.Insert({room:"Path"});
+    else bt.Insert({name:"Mika"},"I should go get my device first.");
+  }
 ]
 
 // INTRO
@@ -66,16 +64,18 @@ label.main_menu = [
 {change:background, image:spr.main_menu},
 {menu:text,
 	choices: main_menu_item
-},
+}
 ]
+
 label.serapoke_intro = [
 {change:background},
 {change:text, x:80, y:150},
-"In this world, where there are many dangers...@                                        @...JIDA keeps the world at peace.",
+"In this world, where there are many dangers...@                           @...JIDA keeps the world at peace.",
 {transition:"fade"},
 {pause:50},
 {jump:"serapoke_init"}
 ]
+
 label.serapoke_init = [
 {change:text, x:80, y:400},
 ()=>{
@@ -93,7 +93,85 @@ label.serapoke_init = [
 {show:"box"},
 {name:"Sayuri"},
 "I see you're dressed for your mission already.",
-"As long as you keep your head down, the vampires@won't be suspicious.",
+{name:"Mika"},
+"Yes. Even if it's just the edge of vampire territory,@I'd rather not draw suspicion.",
+{name:"Sayuri"},
+"Yoichi will be your contact today. Make sure to@pick up your magic device from the desk.",
+{name:"Mika"},
+"I will, thank you.",
+{move:1, dir:"l"},
+{pause:10},
+{move:1, dir:"d"},
+{pause:20}
+]
+
+label.serapoke_path = [
+"*ping*",
+{name:"Yoichi"},
+"Hi! This is Yoichi.",
+{name:"Mika"},
+"insert mission review here",
+"mika must check out a monster sighting at the border",
+"yuu who had an earlier mission is supposed to@meet up with him"
+]
+
+label.serapoke_territory = [
+"This is the vampire territory...",
+{move:0, dir:"l", run:true},
+{pause:60},
+{move:0, dir:"s"},
+{move:0, teleport:true, x:-1, y:-1},
+"!!!",
+"...",
+"Whew, I don't think he saw me..."
+]
+
+label.serapoke_battle_crowley = [
+{name:"Crowley"},
+"placeholder dialogue",
+{move:1, dir:"r"},
+{pause:30},
+{move:1, dir:"s"},
+"more placeholder",
+"yeh",
+{battle:"crowley", lose:"serapoke_battle_loss"},
+{name:"Crowley"},
+"No!",
+{move:1, dir:"l", run:true},
+{pause:30},
+{move:1, dir:"s"},
+"I've been defeated...",
+"Who cares what Ferid is up to anyway.",
+"If you want to find him, try somewhere purple.",
+{setvar:"looking_for_yuu", value:false},
+{setvar:"before_end", value:false}
+]
+
+maps.Territory.creation_code = () => {
+  if (!user_vars.entered_territory) {
+    user_vars.entered_territory = true;
+    calling_npc = null;
+    bt.adv.name.text = "Mika";
+    in_talk = true;
+    bt.Jump("serapoke_territory");
+  } else {
+    npcs[0].x = -1 * GRIDSIZE;
+    if (user_vars.looking_for_yuu) {
+      calling_npc = null;
+      bt.adv.name.text = "Mika";
+      in_talk = true;
+      if (user_vars.has_fought_crowley) {
+        bt.Jump("serapoke_rematch_crowley");
+      } else {
+        user_vars.has_fought_crowley = true;
+        bt.Jump("serapoke_battle_crowley");
+      }
+    }
+  }
+}
+
+label.serapoke_battle_loss = [
+{room:"JIDA"}
 ]
 
 label.serapoke_load = [

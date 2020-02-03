@@ -369,7 +369,7 @@ function Npc({labels, name, image, x, y, spawn_condition, mask}) {
     if (this.image) {
       room.ctx.drawImage(this.image, this.x-this.mask.x, this.y-this.mask.y);
     }
-    else room.ctx.drawImage(spr.block, this.x, this.y);
+    //else room.ctx.drawImage(spr.block, this.x, this.y);
   }
   this.talked_to = false;
   this.say = function() {
@@ -692,7 +692,7 @@ BattleUi.prototype.check_prev = function(move) {
   return false
 }
 BattleUi.prototype.calc_damage = function(att, opp, dmg) {
-  if (dmg < 0) return dmg / 100 * opp.hp;
+  if (dmg < 0) return Math.round(dmg / 100 * opp.hp);
   return Math.max(1, Math.round(
     dmg / 100 * (
       att.atk * (1 + att.atk_mul / 10) -
@@ -702,7 +702,8 @@ BattleUi.prototype.calc_damage = function(att, opp, dmg) {
 }
 
 function spawn_npc(npc, solid = true) {
-  if (!npc.spawn_condition || landscape[npc.spawn_condition]) {
+  if (!npc.spawn_condition || user_vars[npc.spawn_condition] ||
+    (typeof npc.spawn_condition == "function" && npc.spawn_condition())) {
     npc.x *= GRIDSIZE;
     npc.y *= GRIDSIZE;
     npcs.push(npc);

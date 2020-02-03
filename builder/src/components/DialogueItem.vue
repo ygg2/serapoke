@@ -1,5 +1,5 @@
 <template>
-  <v-card color="#ddffdd">
+  <v-card color="#ffeacc">
     <v-card-title>
       {{ pickupOrDrop }}
       <v-btn absolute right icon small @click="deletePrompt = true">

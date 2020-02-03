@@ -1,1 +1,1 @@
-var items = {"boots":{"name":"Thigh-high hover boots","description":"They help you nyoom"}}
+var items = {"boots":{"name":"Thigh-high hover boots","description":"They help you nyoom"},"device":{"name":"Magic Device","description":"Useful to communicate with Yoichi"}}

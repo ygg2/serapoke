@@ -158,7 +158,7 @@ export default {
         {
           color: 'amber',
           cellType: 'template',
-          icon: 'mdi-auto-fix'
+          icon: 'mdi-assistant'
         },
         {
           color: 'red',

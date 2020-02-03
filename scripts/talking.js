@@ -370,8 +370,13 @@ bt.Next = function() {
       }
 
       else if (command.battle) {
+        bt.adv.box.visible = true
+        bt.adv.name.text = '';
+        screen_images.push(new Img(0, 0, spr.battle_bg))
         // set battle variables
         user_vars._enemy = enemies[command.battle].name;
+        // recreate player to not have boosts and what not. because rush
+        party[0].name = new Monster("mika_normal");
         user_vars._leader = party[0].name;
         user_vars._turn = "your turn";
         battle_data = new BattleUi(party[0], new Monster(command.battle));
