@@ -39,8 +39,8 @@ var update = function() {
   }
   //drawx = clamp(player.x+player.mask.width/2-XSIZE/4, 0, map_w-XSIZE/2);
   //drawy = clamp(player.y+player.mask.height/2-YSIZE/4, 0, map_h-YSIZE/2);
-  drawx = clamp(player.x+player.mask.width/2-XSIZE/2, 0, map_w-XSIZE/2);
-  drawy = clamp(player.y+player.mask.height/2-YSIZE/2, 0, map_h-YSIZE/2);
+  drawx = clamp(player.x+player.mask.width/2-XSIZE/2, 0, map_w-XSIZE);
+  drawy = clamp(player.y+player.mask.height/2-YSIZE/2, 0, map_h-YSIZE);
 }
 
 // MAIN DRAW EVENT

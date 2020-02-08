@@ -376,7 +376,7 @@ bt.Next = function() {
         // set battle variables
         user_vars._enemy = enemies[command.battle].name;
         // recreate player to not have boosts and what not. because rush
-        party[0].name = new Monster("mika_normal");
+        party[0] = new Monster("mika_normal");
         user_vars._leader = party[0].name;
         user_vars._turn = "your turn";
         battle_data = new BattleUi(party[0], new Monster(command.battle));
