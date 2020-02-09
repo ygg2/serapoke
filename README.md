@@ -3,6 +3,7 @@
 - title screen with controls
 - owlbear sprite
 - you win screen
-- possible dialogue with yuu?
-- possible dialogue with crowley?
+- dialogue with sayuri?
+- dialogue with crowley?
+- dialogue with yuu?
 - removing debug (do last)
