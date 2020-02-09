@@ -34,7 +34,7 @@ var CHAR_OFFSET_V = 2;
 var CHAR_OFFSET_H = 0;
 
 // standard menu preferences
-var MENU_X = 450;
+var MENU_X = 400;
 var MENU_Y = 370;
 var MENU_SPACING = 50;
 var MENU_INDICATOR = "menu_indicator";

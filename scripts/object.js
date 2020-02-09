@@ -124,16 +124,52 @@ label.serapoke_path = [
 {name:"Mika"},
 "Hello!",
 "Where was it that the monsters were spotted?",
-"Yuu-chan and I were supposed to meet up at the border by the forest soon.",
-"I was going to check it out anyway, but I'm@concerned if he was out there alone and didn't know what to expect.",
+"Yuu-chan and I were supposed to meet up at the border@by the forest soon.",
+"I was going to check it out anyway, but I'm@concerned if he was out there alone and didn't know@what to expect.",
 {name:"Yoichi"},
-"Hmm...yeah, the sighting was in sight of the main path,@so if that's where you're planning to meet him...",
+"Hmm...yeah, the sighting was in sight of the main@path, so if that's where you're planning to meet him...",
 "I'm sure he's alright though!",
-"Yuu-kun's tougher than you give him credit for!"
+"Yuu-kun's tougher than you give him credit for!",
+{menu:text, choices:[
+["He got hurt with a spoon", [
+  {name:"Mika"},
+	"Tell that to the spoon he accidentally managed to@hurt himself with last week.",
+	{name:"Yoichi"},
+	"Haha yeah, I guess he is a bit clumsy sometimes..."
+]],
+["That's natural selection", [
+  {name:"Mika"},
+  "Well, if he is dead that's natural selection.",
+  "Since I'm in the market for a new best friend...",
+  {name:"Yoichi"},
+  "Mika-kun, you know you can't just leave Yuu-kun@behind like that.",
+  "You'd never get over it if something happened to him.",
+  {name:"Mika"},
+  "Yeah...I guess you're right."
+]],
+["If anyone hurt him...", [
+  {name:"Mika"},
+  "Still, if anyone did anything to hurt him, they'll@rue the day they were born.",
+  "I'll tear them limb from limb until the only thing@they know is pain, until their screams drown out@all sound-",
+  {name:"Yoichi"},
+  "OKAYYYY How about you wait to do that until you know@if anything's actually happened to him."
+]],
+["You're right", [
+  {name:"Mika"},
+  "You're right, no one's tougher than my Yuu-chan.",
+  "With as skilled as he is, he could easily take down@any measly monster he encountered."
+]]
+]},
+{name:"Mika"},
+"Anyway, I'll check it out and let you know...",
+"I'm sure he can handle himself if something did show@up, but I can't help but be worried.",
+"Talk to you later, Yoichi.",
+{name:"Yoichi"},
+"Good luck, Mika-kun!"
 ]
 
 label.serapoke_territory = [
-"This is the vampire territory...",
+"This is the border with the vampire territory...",
 {move:0, dir:"l", run:true},
 {pause:60},
 {move:0, dir:"s"},

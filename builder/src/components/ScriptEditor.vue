@@ -207,6 +207,7 @@ export default {
       else if (line.pickup || line.drop) return 'dialogue-item'
       else if (line.setvar || line.setvar === '') return 'dialogue-var'
       else if (line.battle || line.battle === '') return 'dialogue-battle'
+      else if (line.jump || line.jump == '') return 'dialogue-battle'
     },
     addCell() {
       this.story.push('')

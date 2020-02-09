@@ -449,7 +449,7 @@ bt.Next = function() {
         if (_leader_ko) {
           console.log("loss")
           story = [
-            "You lose",
+            "You lose.",
             {transition:"fade"},
             {pause:50},
             () => { screen_images = [] },
@@ -462,7 +462,7 @@ bt.Next = function() {
         }
         if (_enemy_ko) {
           story = [
-            "You win",
+            "You win!",
             {transition:"fade"},
             {pause:25},
             () => { screen_images = [] },
