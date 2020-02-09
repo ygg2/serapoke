@@ -82,7 +82,7 @@ label.main_menu = [
 label.serapoke_intro = [
 {change:background},
 {change:text, x:80, y:150},
-"In this world, where there are many dangers...@                           @...JIDA keeps the world at peace.",
+"In this world, where there are many dangers...@                      @...JIDA keeps the world at peace.",
 {transition:"fade"},
 {pause:50},
 {jump:"serapoke_init"}
@@ -122,9 +122,14 @@ label.serapoke_path = [
 {name:"Yoichi"},
 "Hi! This is Yoichi.",
 {name:"Mika"},
-"insert mission review here",
-"mika must check out a monster sighting at the border",
-"yuu who had an earlier mission is supposed to@meet up with him"
+"Hello!",
+"Where was it that the monsters were spotted?",
+"Yuu-chan and I were supposed to meet up at the border by the forest soon.",
+"I was going to check it out anyway, but I'm@concerned if he was out there alone and didn't know what to expect.",
+{name:"Yoichi"},
+"Hmm...yeah, the sighting was in sight of the main path,@so if that's where you're planning to meet him...",
+"I'm sure he's alright though!",
+"Yuu-kun's tougher than you give him credit for!"
 ]
 
 label.serapoke_territory = [
@@ -179,6 +184,15 @@ maps.Territory.creation_code = () => {
         bt.Jump("serapoke_battle_crowley");
       }
     }
+  }
+}
+maps.Path.creation_code = () => {
+  if (!user_vars.entered_path) {
+    user_vars.entered_path = true;
+    calling_npc = null;
+    bt.adv.name.text = "";
+    in_talk = true;
+    bt.Jump("serapoke_path");
   }
 }
 
