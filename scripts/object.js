@@ -10,6 +10,7 @@ var finished_quests = {};
 var transitions;
 var user_vars = {
   entered_territory: false,
+  after_owlbear: false,
   looking_for_yuu: false,
   before_end: true
 };
@@ -47,12 +48,23 @@ for (let key of Object.keys(maps)) {
 player = new Player(0, 0, "mika");
 
 // adding functionality that isn't in the builder
-maps.JIDA.npcs[3].labels.Main = [
+maps.JIDA.npcs[0].spawn_condition = () => !user_vars.after_owlbear;
+maps.JIDA.npcs[2].labels.Main = [
   () => {
     if (inventory.device) bt.Insert({room:"Path"});
     else bt.Insert({name:"Mika"},"I should go get my device first.");
   }
 ]
+maps.Territory.npcs[2].spawn_condition = () => !user_vars.after_owlbear;
+maps.Territory.npcs[2].labels.Main.push(
+  () => {
+    user_vars.after_owlbear = true;
+  },
+  {move:1, teleport:true, x:-1, y:-1}
+);
+maps.JIDA.npcs[3].labels.Main.push(() => {
+  user_vars.looking_for_yuu = true;
+})
 
 // INTRO
 label.main_menu = [
@@ -87,9 +99,9 @@ label.serapoke_init = [
 {name:"???"},
 "There you are, Mika!",
 {hide:"box"},
-{move:1, dir:"r", run:true},
+{move:0, dir:"r", run:true},
 {pause:40},
-{move:1, dir:"s"},
+{move:0, dir:"s"},
 {show:"box"},
 {name:"Sayuri"},
 "I see you're dressed for your mission already.",
@@ -99,9 +111,9 @@ label.serapoke_init = [
 "Yoichi will be your contact today. Make sure to@pick up your magic device from the desk.",
 {name:"Mika"},
 "I will, thank you.",
-{move:1, dir:"l"},
+{move:0, dir:"l"},
 {pause:10},
-{move:1, dir:"d"},
+{move:0, dir:"d"},
 {pause:20}
 ]
 
