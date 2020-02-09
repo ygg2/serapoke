@@ -23,7 +23,7 @@ if (localStorage.getItem('save')) {
   ]
 } else {
   var main_menu_item = [
-    ["PLAY", "serapoke_intro"],
+    ["PRESS Z TO PLAY", "serapoke_intro"],
   ]
 }
 
@@ -59,8 +59,7 @@ maps.Territory.npcs[2].spawn_condition = () => !user_vars.after_owlbear;
 maps.Territory.npcs[2].labels.Main.push(
   () => {
     user_vars.after_owlbear = true;
-  },
-  {move:1, teleport:true, x:-1, y:-1}
+  }
 );
 maps.JIDA.npcs[3].labels.Main.push(() => {
   user_vars.looking_for_yuu = true;
@@ -73,7 +72,6 @@ label.main_menu = [
   bt.adv.box.visible = false;
   party.push(new Monster("mika_normal"));
 },
-{change:background, image:spr.main_menu},
 {menu:text,
 	choices: main_menu_item
 }
@@ -82,7 +80,7 @@ label.main_menu = [
 label.serapoke_intro = [
 {change:background},
 {change:text, x:80, y:150},
-"In this world, where there are many dangers...@                      @...JIDA keeps the world at peace.",
+"In this world, where there are many dangers...@          @...JIDA keeps the world at peace.",
 {transition:"fade"},
 {pause:50},
 {jump:"serapoke_init"}

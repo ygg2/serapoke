@@ -710,6 +710,10 @@ function spawn_npc(npc, solid = true) {
     if (solid) {
       blocks.push(npc);
     }
+  } else {
+    npc.x = -GRIDSIZE;
+    npc.y = -GRIDSIZE;
+    npcs.push(npc);
   }
 }
 

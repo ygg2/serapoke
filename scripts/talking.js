@@ -421,9 +421,15 @@ bt.Next = function() {
       else if (command.statboost) {
         if (command.relative) {
           if (user_vars._turn == "your turn") {
+            console.log(battle_data.leader);
             battle_data.leader[command.statboost] += command.value;
           } else {
-            battle_data.enemy[command.statboost] += command.value;
+          // fake fixes whee
+            if (command.value > 0) {
+              battle_data.enemy[command.statboost] += command.value;
+            } else {
+              battle_data.leader[command.statboost] += command.value;
+            }
           }
         } else {
           if (user_vars._turn == "your turn") {
@@ -464,9 +470,9 @@ bt.Next = function() {
           story = [
             "You win!",
             {transition:"fade"},
-            {pause:25},
+            {pause:30},
             () => { screen_images = [] },
-            {pause:25},
+            {pause:30},
             ...battle_data.loss_label
           ];
           bt.line = 0;
