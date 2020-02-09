@@ -29,7 +29,7 @@ if (localStorage.getItem('save')) {
 
 function create_objects() {
 //testing
-for (let key of Object.keys(maps)) {
+/*for (let key of Object.keys(maps)) {
   if (key != "Title") {
     label[key] = [
       ()=>{
@@ -42,7 +42,7 @@ for (let key of Object.keys(maps)) {
       [key, key]
     )
   }
-}
+}*/
 
 // player
 player = new Player(0, 0, "mika");
