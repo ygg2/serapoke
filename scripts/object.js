@@ -64,6 +64,9 @@ maps.Territory.npcs[2].labels.Main.push(
 maps.JIDA.npcs[3].labels.Main.push(() => {
   user_vars.looking_for_yuu = true;
 })
+maps.cave.npcs[1].labels.Main.push(() => {
+  location.reload();
+})
 
 // INTRO
 label.main_menu = [
