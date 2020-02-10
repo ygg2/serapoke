@@ -29,7 +29,7 @@ if (localStorage.getItem('save')) {
 
 function create_objects() {
 //testing
-for (let key of Object.keys(maps)) {
+/*for (let key of Object.keys(maps)) {
   if (key != "Title") {
     label[key] = [
       ()=>{
@@ -42,7 +42,7 @@ for (let key of Object.keys(maps)) {
       [key, key]
     )
   }
-}
+}*/
 
 // player
 player = new Player(0, 0, "mika");
@@ -127,7 +127,7 @@ label.serapoke_path = [
 {name:"Mika"},
 "Hello!",
 "Where was it that the monsters were spotted?",
-"Yuu-chan and I were supposed to meet up at the border@by the forest soon.",
+"Yuu-chan and I were supposed to meet up at the west@border soon.",
 "I was going to check it out anyway, but I'm@concerned if he was out there alone and didn't know@what to expect.",
 {name:"Yoichi"},
 "Hmm...yeah, the sighting was in sight of the main@path, so if that's where you're planning to meet him...",
@@ -189,7 +189,7 @@ label.serapoke_battle_crowley = [
 "If you're responsible for whatever happened to@Yuu-chan-",
 {name:"Crowley"},
 "I didn't do a thing to 'Yuu-chan', and whatever@did happen to him was his own fault.",
-"If he didn't go sticking his nose where it didn’t@belong, he would've been fine.",
+"If he didn't go sticking his nose where it didn't@belong, he would've been fine.",
 {name:"Mika"},
 "What are you talking about?",
 {name:"Crowley"},
