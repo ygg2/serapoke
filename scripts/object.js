@@ -29,7 +29,7 @@ if (localStorage.getItem('save')) {
 
 function create_objects() {
 //testing
-/*for (let key of Object.keys(maps)) {
+for (let key of Object.keys(maps)) {
   if (key != "Title") {
     label[key] = [
       ()=>{
@@ -42,7 +42,7 @@ function create_objects() {
       [key, key]
     )
   }
-}*/
+}
 
 // player
 player = new Player(0, 0, "mika");
@@ -63,10 +63,12 @@ maps.Territory.npcs[2].labels.Main.push(
 );
 maps.JIDA.npcs[3].labels.Main.push(() => {
   user_vars.looking_for_yuu = true;
-})
-maps.cave.npcs[1].labels.Main.push(() => {
+});
+maps.cave.npcs[1].labels.Ending.push({transition:"fade"});
+maps.cave.npcs[1].labels.Ending.push({pause:60});
+maps.cave.npcs[1].labels.Ending.push(() => {
   location.reload();
-})
+});
 
 // INTRO
 label.main_menu = [
@@ -181,22 +183,39 @@ label.serapoke_territory = [
 ]
 
 label.serapoke_battle_crowley = [
+{name:"Mika"},
+"You!",
+"You're working with the vampires, aren't you?",
+"If you're responsible for whatever happened to@Yuu-chan-",
 {name:"Crowley"},
-"placeholder dialogue",
+"I didn't do a thing to 'Yuu-chan', and whatever@did happen to him was his own fault.",
+"If he didn't go sticking his nose where it didn’t@belong, he would've been fine.",
+{name:"Mika"},
+"What are you talking about?",
+{name:"Crowley"},
+"Whatever happens to him now is up to Ferid, and it's@none of your business to interfere with it.",
+{name:"Mika"},
+"Ferid?!",
+"So that's who took him?",
+{name:"Crowley"},
+"Ferid didn't do any taking, it was Yuu that had the@bright idea to go wandering straight into his cave.",
 {move:1, dir:"r"},
 {pause:30},
 {move:1, dir:"s"},
-"more placeholder",
-"yeh",
+"He has every right to do whatever he wants with Yuu,@and you have no right to interfere.",
+{name:"Mika"},
+"The cave, so that's where he is!",
+"I'll be there soon to save you, Yuu-chan.",
+{name:"Crowley"},
+"Not if I can help it!",
 {battle:"crowley", lose:"serapoke_battle_loss"},
 {name:"Crowley"},
 "No!",
 {move:1, dir:"l", run:true},
 {pause:30},
 {move:1, dir:"s"},
-"I've been defeated...",
-"Who cares what Ferid is up to anyway.",
-"If you want to find him, try somewhere purple.",
+{name:"Mika"},
+"I'm going to save Yuu-chan, and there's nothing you@can do to stop me.",
 {setvar:"looking_for_yuu", value:false},
 {setvar:"before_end", value:false}
 ]
