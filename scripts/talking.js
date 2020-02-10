@@ -381,7 +381,7 @@ bt.Next = function() {
         user_vars._turn = "your turn";
         battle_data = new BattleUi(party[0], new Monster(command.battle));
         battle_data.saved_dialogue = story.splice(bt.line);
-        battle_data.loss_label = command.loss || battle_data.saved_dialogue;
+        battle_data.loss_label = command.loss || [{room:"JIDA"}]//battle_data.saved_dialogue;
         screen_images.push(battle_data);
         // menu
         let _current_index = bt.line + 2;
@@ -462,7 +462,7 @@ bt.Next = function() {
             "Mika scurried back to JIDA...",
             {transition:"fade"},
             {pause:50},
-            ...battle_data.saved_dialogue
+            ...battle_data.loss_label
           ];
           bt.line = 0;
         }
@@ -473,7 +473,7 @@ bt.Next = function() {
             {pause:30},
             () => { screen_images = [] },
             {pause:30},
-            ...battle_data.loss_label
+            ...battle_data.saved_dialogue
           ];
           bt.line = 0;
         }
