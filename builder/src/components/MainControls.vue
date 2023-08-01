@@ -8,7 +8,7 @@
     <template v-slot:activator>
       <v-btn fab>
         <v-icon v-if="globalOptionsOpen">mdi-close</v-icon>
-        <v-icon v-else>mdi-settings</v-icon>
+        <v-icon v-else>mdi-cog</v-icon>
       </v-btn>
     </template>
     <v-btn

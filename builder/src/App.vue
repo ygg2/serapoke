@@ -22,7 +22,7 @@
       @open-npc-editor="currentEditor = 'npc-editor'"
       @create-map="currentEditor = 'new-map-editor'"
     />
-    <v-content app>
+    <v-main app>
       <div style="max-width:100%;overflow:scroll;max-height:95%">
         <div
           style="height: 100vh; background: linear-gradient(black, white); position: relative;"
@@ -95,7 +95,7 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
